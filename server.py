@@ -581,7 +581,7 @@ def tg_api_call(method, payload=None):
     data = json.dumps(payload).encode("utf-8") if payload else None
     req = urllib.request.Request(url, data=data, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=35) as res:
+        with urllib.request.urlopen(req, timeout=8) as res:
             return json.loads(res.read().decode("utf-8"))
     except Exception as e:
         if "timed out" not in str(e).lower():
@@ -640,24 +640,11 @@ def tg_send_welcome(chat_id, first_name):
             [{"text": "📊 Jonli Statistika", "callback_data": "btn_stats"}, {"text": "ℹ️ Qoidalar", "callback_data": "btn_rules"}]
         ]
     }
-    reply_kb = {
-        "keyboard": [
-            [{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}],
-            [{"text": "📊 Jonli Statistika"}, {"text": "ℹ️ Yordam & Qoidalar"}]
-        ],
-        "resize_keyboard": True,
-        "is_persistent": True
-    }
 
+    # Bitta tezkor so'rov bilan darhol javob qaytaramiz (kechikishsiz)
     tg_api_call("sendMessage", {
         "chat_id": chat_id,
         "text": welcome_text,
-        "parse_mode": "HTML",
-        "reply_markup": reply_kb
-    })
-    tg_api_call("sendMessage", {
-        "chat_id": chat_id,
-        "text": "👇 <b>Platformaga o'tish uchun quyidagi tugmani bosing:</b>",
         "parse_mode": "HTML",
         "reply_markup": inline_kb
     })
@@ -682,7 +669,8 @@ def run_telegram_bot_daemon():
     offset = 0
     while True:
         try:
-            updates = tg_api_call("getUpdates", {"offset": offset, "timeout": 20})
+            # 1 soniyalik ultra-tezkor tekshiruv (kechikishlarsiz)
+            updates = tg_api_call("getUpdates", {"offset": offset, "timeout": 1})
             if updates and updates.get("ok"):
                 for item in updates.get("result", []):
                     offset = item["update_id"] + 1
@@ -761,7 +749,7 @@ def run_telegram_bot_daemon():
                                 "parse_mode": "HTML"
                             })
 
-            time.sleep(0.4)
+            time.sleep(0.1)
         except Exception as e:
             time.sleep(2)
 
