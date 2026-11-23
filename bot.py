@@ -104,14 +104,14 @@ def setup_bot_profile(bot_info):
     Bot Telegramda ochilganda chiroyli va rasmiy ko'rinishi uchun
     Tavsif, Buyruqlar va Menyu tugmasini avtomatik sozlaydi.
     """
-    bot_name = bot_info.get("first_name", "AKSS Voice")
+    bot_name = bot_info.get("first_name", "AK SS Voice")
     username = bot_info.get("username", "bot")
     print(f"⚙️ @{username} profilini avtomatik sozlash...")
 
     # 1. Chat ochilganda (Start bosishdan oldin) chiqadigan matn
     description_text = (
         "🏛 Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktab (Andijon)\n"
-        "O'quvchilar Kengashi (Student Council) rasmiy anonim takliflar va muammolar platformasi.\n\n"
+        "O'quvchilar va O'qituvchilar Kengashi rasmiy anonim takliflar va muammolar platformasi.\n\n"
         "📌 Maktabdagi har qanday kamchilik yoki yangi g'oyani 100% anonim qoldiring va ovoz bering.\n\n"
         "⚡ 50 ta haqiqiy ovoz to'plagan har bir masala dushanba kuni direktor stoliga taqdim etiladi!\n\n"
         "Boshlash uchun quyidagi «Start» tugmasini bosing 👇"
@@ -120,13 +120,13 @@ def setup_bot_profile(bot_info):
 
     # 2. Qisqa tavsif (Profil oynasida ko'rinadi)
     api_call("setMyShortDescription", {
-        "short_description": "AKSS rasmiy anonim takliflar va Student Council portali."
+        "short_description": "AK SS rasmiy anonim takliflar va Kengash portali."
     })
 
     # 3. Buyruqlar menyusi
     commands = [
         {"command": "start", "description": "Botni ishga tushirish va portal havolasi"},
-        {"command": "portal", "description": "AKSS Voice WebApp portalini ochish"},
+        {"command": "portal", "description": "AK SS Voice WebApp portalini ochish"},
         {"command": "stats", "description": "Jonli maktab takliflari statistikasi"},
         {"command": "help", "description": "Platforma qoidalari va yordam"}
     ]
@@ -136,7 +136,7 @@ def setup_bot_profile(bot_info):
     api_call("setChatMenuButton", {
         "menu_button": {
             "type": "web_app",
-            "text": "📢 AKSS Voice",
+            "text": "📢 AK SS Voice",
             "web_app": {"url": WEB_APP_URL}
         }
     })
@@ -148,7 +148,7 @@ def get_keyboards():
         "inline_keyboard": [
             [
                 {
-                    "text": "🚀 AKSS Voice Portalini Ochish",
+                    "text": "🚀 AK SS Voice Portalini Ochish",
                     "web_app": {"url": WEB_APP_URL}
                 }
             ],
@@ -163,7 +163,7 @@ def get_keyboards():
         "keyboard": [
             [
                 {
-                    "text": "🚀 AKSS Voice Portalini Ochish",
+                    "text": "🚀 AK SS Voice Portalini Ochish",
                     "web_app": {"url": WEB_APP_URL}
                 }
             ],
@@ -181,13 +181,13 @@ def get_keyboards():
 def send_welcome(chat_id, first_name):
     welcome_text = (
         f"Assalomu alaykum, <b>{first_name}</b>! 👋\n\n"
-        "🏛 <b>AKSS Voice — Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktabi</b>\n"
-        "<b>Student Council (O'quvchilar Kengashi)</b> rasmiy anonim takliflar va muammolar platformasiga xush kelibsiz!\n\n"
+        "🏛 <b>AK SS Voice — Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktabi</b>\n"
+        "<b>O'quvchilar va O'qituvchilar Kengashi</b> rasmiy anonim takliflar va muammolar platformasiga xush kelibsiz!\n\n"
         "📌 <b>Platforma nima uchun kerak?</b>\n"
         "• <b>100% Anonimlik:</b> Wi-Fi, sinfxona sharoitlari, oshxona yoki darslar bo'yicha hech kimdan cho'chimasdan taklif yozing.\n"
-        "• <b>Adolatli Ovoz:</b> Boshqa o'quvchilar ko'tarayotgan takliflarni qo'llab-quvvatlang.\n"
+        "• <b>Adolatli Ovoz:</b> Boshqa o'quvchilar va ustozlar ko'tarayotgan takliflarni qo'llab-quvvatlang.\n"
         "• <b>So'rovnomalar:</b> Maktab ma'muriyati va Kengash e'lon qilgan rasmiy so'rovnomalarda ovoz bering.\n\n"
-        "⚡ <b>50 ta ovoz yig'ilgan har bir masala</b> dushanba kuni Student Council orqali "
+        "⚡ <b>50 ta ovoz yig'ilgan har bir masala</b> dushanba kuni Kengash orqali "
         "<b>to'g'ridan-to'g'ri maktab direktoriga</b> taqdim etiladi.\n\n"
         "Quyidagi tugmani bosing va platformani oching 👇"
     )
@@ -221,11 +221,11 @@ def send_stats(chat_id):
         return
 
     text = (
-        "📊 <b>AKSS Voice — Jonli Maktab Statistikasi:</b>\n\n"
+        "📊 <b>AK SS Voice — Jonli Maktab Statistikasi:</b>\n\n"
         f"💡 Jami anonim takliflar: <b>{stats['total_props']} ta</b>\n"
         f"🔥 Direktor stolida (50+ ovoz): <b>{stats['council_count']} ta</b>\n"
         f"🟢 Hal etilgan / Bajarilgan: <b>{stats['resolved_count']} ta</b>\n"
-        f"🗳 O'quvchilar bergan ovozlari: <b>{stats['total_votes']} ta</b>\n\n"
+        f"🗳 O'quvchilar va O'qituvchilar ovozlari: <b>{stats['total_votes']} ta</b>\n\n"
         f"🏆 <b>Eng trenddagi taklif:</b>\n"
         f"«<i>{stats['top_title']}</i>» (<b>{stats['top_votes']} ta ovoz</b>)\n\n"
         "Siz ham o'z taklifingizni kiritish uchun portalni oching!"
@@ -240,12 +240,12 @@ def send_stats(chat_id):
 
 def send_help(chat_id):
     help_text = (
-        "ℹ️ <b>AKSS Voice Platformasi Qoidalari:</b>\n\n"
+        "ℹ️ <b>AK SS Voice Platformasi Qoidalari:</b>\n\n"
         "1. <b>Haqiqiy anonimlik:</b> Ism-familiyangiz, profilingiz yoki telefon raqamingiz hech kimga ko'rinmaydi.\n"
         "2. <b>Odob-axloq:</b> Haqoratli, tuhmat yoki nojo'ya so'zlar avtomatik AI-filtr orqali bloklanadi.\n"
-        "3. <b>50 ta Ovoz me'yori:</b> Jiddiy muammolar 50 ta ovoz yig'gach, «Direktor stolida» maqomini oladi va Student Council raisi uni shaxsan direktorga kiritadi.\n"
+        "3. <b>50 ta Ovoz me'yori:</b> Jiddiy muammolar 50 ta ovoz yig'gach, «Direktor stolida» maqomini oladi va Kengash raisi uni shaxsan direktorga kiritadi.\n"
         "4. <b>Rasmiy javob:</b> Muammo hal etilgach, platformada uning holati «🟢 Hal etildi» deb belgilanadi.\n\n"
-        "Savol yoki takliflar uchun Student Council Kengashiga murojaat qilishingiz mumkin."
+        "Savol yoki takliflar uchun Kengashga murojaat qilishingiz mumkin."
     )
     inline_kb, _ = get_keyboards()
     api_call("sendMessage", {
