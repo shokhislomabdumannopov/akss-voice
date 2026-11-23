@@ -49,13 +49,15 @@ def api_call(method, payload=None):
     data = json.dumps(payload).encode("utf-8") if payload else None
     req = urllib.request.Request(url, data=data, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with urllib.request.urlopen(req, timeout=35) as res:
             return json.loads(res.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8") if e.fp else str(e)
         print(f"[Telegram API Xatolik] {method} ({e.code}): {err_body}")
         return None
     except Exception as e:
+        if "timed out" in str(e).lower():
+            return None
         print(f"[Tarmoq Xatoligi] {method}: {e}")
         return None
 
