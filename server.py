@@ -2,6 +2,9 @@ import json
 import sqlite3
 import hashlib
 import time
+import html
+import random
+from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import urllib.parse
 import urllib.request
@@ -60,6 +63,24 @@ def init_db():
         CREATE TABLE IF NOT EXISTS app_metadata (
             key TEXT PRIMARY KEY,
             val TEXT
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS direct_messages (
+            id TEXT PRIMARY KEY,
+            subject TEXT NOT NULL,
+            message TEXT NOT NULL,
+            sender TEXT NOT NULL,
+            created_at REAL NOT NULL,
+            delivered INTEGER DEFAULT 0
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS telegram_users (
+            chat_id INTEGER PRIMARY KEY,
+            username TEXT,
+            first_name TEXT,
+            last_seen REAL
         )
     ''')
     
@@ -193,6 +214,26 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
                 })
             conn.close()
             self.send_json({'success': True, 'polls': polls})
+            return
+
+        elif path == '/api/direct-messages':
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            c.execute('SELECT * FROM direct_messages ORDER BY created_at DESC')
+            rows = c.fetchall()
+            messages = []
+            for r in rows:
+                messages.append({
+                    'id': r['id'],
+                    'subject': r['subject'],
+                    'message': r['message'],
+                    'sender': r['sender'],
+                    'delivered': bool(r['delivered']),
+                    'date': self.format_relative_time(r['created_at'])
+                })
+            conn.close()
+            self.send_json({'success': True, 'messages': messages})
             return
 
         # Fallback to serve static files (voice.html, index.html, etc.)
@@ -460,6 +501,93 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
             self.send_json({'success': True, 'message': 'Barcha ma\'lumotlar tozalandi (0 ta)'})
             return
 
+        elif path == '/api/direct-message':
+            subject = body.get('subject', '').strip()
+            message_text = body.get('message', '').strip()
+            sender = body.get('sender', 'Anonim O\'quvchi').strip() or 'Anonim O\'quvchi'
+
+            if not subject or not message_text:
+                self.send_json({'error': 'Mavzu (subject) va xabar matni to\'ldirilishi shart!'}, 400)
+                return
+
+            if not is_clean_text(subject) or not is_clean_text(message_text):
+                self.send_json({'error': 'Xabarda odobsiz yoki nojo\'iz so\'zlar aniqlandi!'}, 400)
+                return
+
+            msg_id = f"dm-{int(time.time())}-{random.randint(100, 999)}"
+            now_ts = time.time()
+
+            conn = sqlite3.connect(DB_FILE)
+            c = conn.cursor()
+            c.execute('''
+                INSERT INTO direct_messages (id, subject, message, sender, created_at, delivered)
+                VALUES (?, ?, ?, ?, ?, 0)
+            ''', (msg_id, subject, message_text, sender, now_ts))
+            conn.commit()
+
+            # Find @shoxislom chat ID
+            c.execute("SELECT val FROM app_metadata WHERE key = 'admin_chat_id'")
+            row = c.fetchone()
+            admin_chat_id = row[0] if row else None
+
+            if not admin_chat_id:
+                c.execute("SELECT chat_id FROM telegram_users WHERE LOWER(username) = 'shoxislom'")
+                u_row = c.fetchone()
+                if u_row:
+                    admin_chat_id = str(u_row[0])
+
+            delivered = 0
+            if admin_chat_id:
+                formatted_time = datetime.fromtimestamp(now_ts).strftime('%Y-%m-%d %H:%M')
+                tg_text = (
+                    "📬 <b>YANGI ERKIN MUROJAAT (AKSS Voice)</b>\n\n"
+                    f"📌 <b>Mavzu:</b> {html.escape(subject)}\n"
+                    f"👤 <b>Yuboruvchi:</b> {html.escape(sender)}\n"
+                    f"🕒 <b>Vaqt:</b> {formatted_time}\n\n"
+                    f"📝 <b>Xabar matni:</b>\n"
+                    f"{html.escape(message_text)}\n\n"
+                    f"🌐 <a href=\"{WEB_APP_URL}\">AKSS Voice Portaliga o'tish</a>"
+                )
+                res = tg_api_call("sendMessage", {
+                    "chat_id": int(admin_chat_id),
+                    "text": tg_text,
+                    "parse_mode": "HTML",
+                    "reply_markup": {
+                        "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                    }
+                })
+                if res and res.get("ok"):
+                    delivered = 1
+                    c.execute("UPDATE direct_messages SET delivered = 1 WHERE id = ?", (msg_id,))
+                    conn.commit()
+
+            conn.close()
+
+            self.send_json({
+                'success': True,
+                'id': msg_id,
+                'delivered': bool(delivered),
+                'note': 'Telegramga yetkazildi' if delivered else '@shoxislom hali botga /start bosmagan. Xabar saqlandi va u botga kirganda avtomatik yetkaziladi.'
+            })
+            return
+
+        elif path.startswith('/api/direct-message-delete/'):
+            dm_id = path.replace('/api/direct-message-delete/', '')
+            admin_pin = body.get('adminPin', '').strip()
+
+            if admin_pin != ADMIN_SECRET_KEY:
+                self.send_json({'error': 'Xato Maxfiy Kod!'}, 403)
+                return
+
+            conn = sqlite3.connect(DB_FILE)
+            c = conn.cursor()
+            c.execute('DELETE FROM direct_messages WHERE id = ?', (dm_id,))
+            conn.commit()
+            conn.close()
+
+            self.send_json({'success': True, 'deletedId': dm_id})
+            return
+
         self.send_json({'error': 'API topilmadi'}, 404)
 
     def format_relative_time(self, ts):
@@ -579,12 +707,146 @@ def run_telegram_bot_daemon():
                     if msg:
                         text = msg.get("text", "")
                         chat_id = msg["chat"]["id"]
-                        first_name = msg["from"].get("first_name", "O'quvchi")
+                        from_user = msg.get("from", {})
+                        first_name = from_user.get("first_name", "O'quvchi")
+                        username = (from_user.get("username") or "").lower().replace("@", "")
 
-                        print(f"📩 [Telegram Xabar] {first_name}: {text}")
+                        print(f"📩 [Telegram Xabar] {first_name} (@{username}): {text}")
+
+                        # Record user & check if @shoxislom
+                        is_shoxislom = (username == "shoxislom")
+                        try:
+                            conn = sqlite3.connect(DB_FILE)
+                            c = conn.cursor()
+                            c.execute('''
+                                INSERT OR REPLACE INTO telegram_users (chat_id, username, first_name, last_seen)
+                                VALUES (?, ?, ?, ?)
+                            ''', (chat_id, username, first_name, time.time()))
+
+                            if is_shoxislom:
+                                c.execute("INSERT OR REPLACE INTO app_metadata (key, val) VALUES ('admin_chat_id', ?)", (str(chat_id),))
+                                conn.commit()
+
+                                # Flush undelivered direct messages to @shoxislom
+                                c.execute("SELECT id, subject, message, sender, created_at FROM direct_messages WHERE delivered = 0")
+                                pending = c.fetchall()
+                                for p_id, p_subj, p_msg, p_snd, p_ts in pending:
+                                    p_time = datetime.fromtimestamp(p_ts).strftime('%Y-%m-%d %H:%M')
+                                    tg_api_call("sendMessage", {
+                                        "chat_id": chat_id,
+                                        "text": (
+                                            "📬 <b>YANGI ERKIN MUROJAAT (AKSS Voice)</b>\n\n"
+                                            f"📌 <b>Mavzu:</b> {html.escape(p_subj)}\n"
+                                            f"👤 <b>Yuboruvchi:</b> {html.escape(p_snd)}\n"
+                                            f"🕒 <b>Vaqt:</b> {p_time}\n\n"
+                                            f"📝 <b>Xabar matni:</b>\n"
+                                            f"{html.escape(p_msg)}"
+                                        ),
+                                        "parse_mode": "HTML"
+                                    })
+                                    c.execute("UPDATE direct_messages SET delivered = 1 WHERE id = ?", (p_id,))
+                                    conn.commit()
+
+                            conn.commit()
+                            conn.close()
+                        except Exception as e:
+                            print(f"[User Record Error] {e}")
 
                         if text.startswith("/start"):
-                            tg_send_welcome(chat_id, first_name)
+                            if is_shoxislom:
+                                tg_api_call("sendMessage", {
+                                    "chat_id": chat_id,
+                                    "text": (
+                                        f"👑 Assalomu alaykum, <b>{first_name} (@shoxislom)</b>!\n\n"
+                                        "✅ <b>Siz AKSS Voice boshqaruvchisi sifatida botga muvaffaqiyatli bog'landingiz!</b>\n"
+                                        f"🆔 Sizning Telegram Chat ID: <code>{chat_id}</code>\n\n"
+                                        "📬 O'quvchilar AKSS Voice portalidagi <b>«Erkin Murojaat»</b> bo'limidan "
+                                        "yozgan har bir xabar (Mavzu va Matn) <b>to'g'ridan-to'g'ri shu yerga</b> yetib keladi!"
+                                    ),
+                                    "parse_mode": "HTML",
+                                    "reply_markup": {
+                                        "inline_keyboard": [[{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                    }
+                                })
+                            else:
+                                tg_send_welcome(chat_id, first_name)
+                        elif text.startswith("/setadmin"):
+                            try:
+                                conn = sqlite3.connect(DB_FILE)
+                                c = conn.cursor()
+                                c.execute("INSERT OR REPLACE INTO app_metadata (key, val) VALUES ('admin_chat_id', ?)", (str(chat_id),))
+                                conn.commit()
+                                conn.close()
+                                tg_api_call("sendMessage", {
+                                    "chat_id": chat_id,
+                                    "text": f"👑 <b>Ushbu chat ({chat_id}) admin qabul qiluvchi sifatida saqlandi!</b> Barcha murojaatlar shu yerga yuboriladi.",
+                                    "parse_mode": "HTML"
+                                })
+                            except Exception as e:
+                                pass
+                        elif text.startswith("/murojaat"):
+                            content = text.replace("/murojaat", "").strip()
+                            if "|" in content:
+                                parts = content.split("|", 1)
+                                m_subj = parts[0].strip()
+                                m_body = parts[1].strip()
+                            elif "\n" in content:
+                                parts = content.split("\n", 1)
+                                m_subj = parts[0].strip()
+                                m_body = parts[1].strip()
+                            else:
+                                m_subj = ""
+                                m_body = ""
+
+                            if m_subj and m_body:
+                                m_id = f"dm-{int(time.time())}-{random.randint(100, 999)}"
+                                m_ts = time.time()
+                                sender_label = f"Telegram orqali: {first_name}"
+                                conn = sqlite3.connect(DB_FILE)
+                                c = conn.cursor()
+                                c.execute("INSERT INTO direct_messages VALUES (?, ?, ?, ?, ?, 0)", (m_id, m_subj, m_body, sender_label, m_ts))
+                                conn.commit()
+
+                                # Forward to @shoxislom
+                                c.execute("SELECT val FROM app_metadata WHERE key = 'admin_chat_id'")
+                                a_row = c.fetchone()
+                                if a_row:
+                                    tg_api_call("sendMessage", {
+                                        "chat_id": int(a_row[0]),
+                                        "text": (
+                                            "📬 <b>YANGI ERKIN MUROJAAT (Telegram orqali)</b>\n\n"
+                                            f"📌 <b>Mavzu:</b> {html.escape(m_subj)}\n"
+                                            f"👤 <b>Yuboruvchi:</b> {html.escape(sender_label)}\n\n"
+                                            f"📝 <b>Xabar matni:</b>\n"
+                                            f"{html.escape(m_body)}"
+                                        ),
+                                        "parse_mode": "HTML"
+                                    })
+                                    c.execute("UPDATE direct_messages SET delivered = 1 WHERE id = ?", (m_id,))
+                                    conn.commit()
+                                conn.close()
+
+                                tg_api_call("sendMessage", {
+                                    "chat_id": chat_id,
+                                    "text": "✅ <b>Murojaatingiz qabul qilindi va @shoxislom ga yetkazildi!</b>",
+                                    "parse_mode": "HTML"
+                                })
+                            else:
+                                tg_api_call("sendMessage", {
+                                    "chat_id": chat_id,
+                                    "text": (
+                                        "✍️ <b>Erkin Murojaat yuborish:</b>\n\n"
+                                        "Murojaatingizni quyidagi formatda yuboring:\n"
+                                        "<code>/murojaat Mavzu | Xabar matni</code>\n\n"
+                                        "<i>Masalan:</i>\n"
+                                        "<code>/murojaat Wi-Fi tezligi | 3-qavat IT Labda internet tezligi past bo'lmoqda.</code>\n\n"
+                                        "Yoki portal orqali 2 ta alohida maydon bilan qulay yuborish uchun pastdagi tugmani bosing 👇"
+                                    ),
+                                    "parse_mode": "HTML",
+                                    "reply_markup": {
+                                        "inline_keyboard": [[{"text": "✍️ Portal orqali yozish", "web_app": {"url": WEB_APP_URL}}]]
+                                    }
+                                })
                         elif text.startswith("/portal") or "portal" in text.lower():
                             tg_api_call("sendMessage", {
                                 "chat_id": chat_id,
