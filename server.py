@@ -4,6 +4,8 @@ import hashlib
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import urllib.parse
+import urllib.request
+import threading
 import os
 
 DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'voice.db')
@@ -569,16 +571,218 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
         else:
             return f"{int(diff // 86400)} kun oldin"
 
-def run_server(port=3000):
+# --- 24/7 TELEGRAM BOT DAEMON (RUNS INSIDE RENDER CLOUD) ---
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "9273166206:AAGjhSkH1qoWIrBBIA1xhtDLFJfMyrACAFc").strip()
+WEB_APP_URL = os.getenv("WEB_APP_URL", "https://akss-voice.onrender.com").strip()
+
+def tg_api_call(method, payload=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps(payload).encode("utf-8") if payload else None
+    req = urllib.request.Request(url, data=data, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=35) as res:
+            return json.loads(res.read().decode("utf-8"))
+    except Exception as e:
+        if "timed out" not in str(e).lower():
+            print(f"[Telegram API Error] {method}: {e}")
+        return None
+
+def get_live_stats_text():
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM proposals")
+        total_props = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM proposals WHERE status = 'resolved'")
+        resolved = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM proposals WHERE status = 'council' OR vote_count >= 50")
+        council = c.fetchone()[0]
+        c.execute("SELECT SUM(vote_count) FROM proposals")
+        votes = c.fetchone()[0] or 0
+        c.execute("SELECT title, vote_count FROM proposals ORDER BY vote_count DESC LIMIT 1")
+        top = c.fetchone()
+        conn.close()
+
+        top_title = top[0] if top else "Hozircha yo'q"
+        top_votes = top[1] if top else 0
+
+        return (
+            "📊 <b>AKSS Voice — Jonli Maktab Statistikasi:</b>\n\n"
+            f"💡 Jami anonim takliflar: <b>{total_props} ta</b>\n"
+            f"🔥 Direktor stolida (50+ ovoz): <b>{council} ta</b>\n"
+            f"🟢 Hal etilgan / Bajarilgan: <b>{resolved} ta</b>\n"
+            f"🗳 O'quvchilar bergan ovozlari: <b>{votes} ta</b>\n\n"
+            f"🏆 <b>Eng faol taklif:</b>\n"
+            f"«<i>{top_title}</i>» (<b>{top_votes} ta ovoz</b>)\n\n"
+            "O'z taklifingizni kiritish uchun quyidagi tugmani bosing!"
+        )
+    except Exception as e:
+        return f"Statistika yuklanmadi: {e}"
+
+def tg_send_welcome(chat_id, first_name):
+    welcome_text = (
+        f"Assalomu alaykum, <b>{first_name}</b>! 👋\n\n"
+        "🏛 <b>AKSS Voice — Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktabi</b>\n"
+        "<b>Student Council (O'quvchilar Kengashi)</b> rasmiy anonim takliflar va muammolar platformasiga xush kelibsiz!\n\n"
+        "📌 <b>Platformada siz:</b>\n"
+        "• Maktabdagi har qanday kamchilik (Wi-Fi, oshxona, sharoit) bo'yicha <b>100% anonim</b> taklif qoldirishingiz;\n"
+        "• Boshqa o'quvchilar takliflariga ovoz berishingiz;\n"
+        "• Kengash e'lon qilgan 6 ta vazirlik so'rovnomalarida qatnashishingiz mumkin.\n\n"
+        "⚡ <b>50 ta ovoz yig'ilgan har bir masala</b> dushanba kuni Student Council orqali "
+        "<b>to'g'ridan-to'g'ri maktab direktoriga</b> taqdim etiladi.\n\n"
+        "Quyidagi tugmani bosing va platformani oching 👇"
+    )
+
+    inline_kb = {
+        "inline_keyboard": [
+            [{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}],
+            [{"text": "📊 Jonli Statistika", "callback_data": "btn_stats"}, {"text": "ℹ️ Qoidalar", "callback_data": "btn_rules"}]
+        ]
+    }
+    reply_kb = {
+        "keyboard": [
+            [{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}],
+            [{"text": "📊 Jonli Statistika"}, {"text": "ℹ️ Yordam & Qoidalar"}]
+        ],
+        "resize_keyboard": True,
+        "is_persistent": True
+    }
+
+    tg_api_call("sendMessage", {
+        "chat_id": chat_id,
+        "text": welcome_text,
+        "parse_mode": "HTML",
+        "reply_markup": reply_kb
+    })
+    tg_api_call("sendMessage", {
+        "chat_id": chat_id,
+        "text": "👇 <b>Platformaga o'tish uchun quyidagi tugmani bosing:</b>",
+        "parse_mode": "HTML",
+        "reply_markup": inline_kb
+    })
+
+def run_telegram_bot_daemon():
+    if not BOT_TOKEN or BOT_TOKEN == "YOUR_BOT_TOKEN_HERE":
+        print("⚠️ [Telegram Bot] Token yo'q, bot ishga tushmadi.")
+        return
+
+    print(f"🤖 [Telegram Bot] Bulutda (Render) 24/7 orqa fonda ishga tushmoqda...")
+    try:
+        tg_api_call("setChatMenuButton", {
+            "menu_button": {
+                "type": "web_app",
+                "text": "📢 AKSS Voice",
+                "web_app": {"url": WEB_APP_URL}
+            }
+        })
+    except Exception as e:
+        print(f"[Telegram MenuButton Error] {e}")
+
+    offset = 0
+    while True:
+        try:
+            updates = tg_api_call("getUpdates", {"offset": offset, "timeout": 20})
+            if updates and updates.get("ok"):
+                for item in updates.get("result", []):
+                    offset = item["update_id"] + 1
+
+                    msg = item.get("message")
+                    if msg:
+                        text = msg.get("text", "")
+                        chat_id = msg["chat"]["id"]
+                        first_name = msg["from"].get("first_name", "O'quvchi")
+
+                        print(f"📩 [Telegram Xabar] {first_name}: {text}")
+
+                        if text.startswith("/start"):
+                            tg_send_welcome(chat_id, first_name)
+                        elif text.startswith("/portal") or "portal" in text.lower():
+                            tg_api_call("sendMessage", {
+                                "chat_id": chat_id,
+                                "text": "🚀 <b>AKSS Voice Portalini ochish uchun quyidagi tugmani bosing:</b>",
+                                "parse_mode": "HTML",
+                                "reply_markup": {
+                                    "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                }
+                            })
+                        elif text.startswith("/stats") or "statistika" in text.lower():
+                            tg_api_call("sendMessage", {
+                                "chat_id": chat_id,
+                                "text": get_live_stats_text(),
+                                "parse_mode": "HTML",
+                                "reply_markup": {
+                                    "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                }
+                            })
+                        elif text.startswith("/help") or "yordam" in text.lower() or "qoida" in text.lower():
+                            tg_api_call("sendMessage", {
+                                "chat_id": chat_id,
+                                "text": (
+                                    "ℹ️ <b>AKSS Voice Platformasi Qoidalari:</b>\n\n"
+                                    "1. <b>100% Anonimlik:</b> Ism-familiyangiz hech kimga ko'rinmaydi.\n"
+                                    "2. <b>50 ta Ovoz:</b> 50 ta haqiqiy ovoz to'plagan har bir masala dushanba kuni direktor stoliga kiritiladi.\n"
+                                    "3. <b>6 ta Vazirlik:</b> Student Council so'rovnomalari 6 ta vazirlik yo'nalishida o'tkaziladi."
+                                ),
+                                "parse_mode": "HTML",
+                                "reply_markup": {
+                                    "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                }
+                            })
+                        else:
+                            tg_api_call("sendMessage", {
+                                "chat_id": chat_id,
+                                "text": f"Assalomu alaykum, <b>{first_name}</b>!\nPortalni ochish uchun quyidagi tugmani bosing 👇",
+                                "parse_mode": "HTML",
+                                "reply_markup": {
+                                    "inline_keyboard": [[{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                }
+                            })
+
+                    cb = item.get("callback_query")
+                    if cb:
+                        cb_id = cb["id"]
+                        cb_data = cb.get("data")
+                        cb_chat = cb["message"]["chat"]["id"]
+                        tg_api_call("answerCallbackQuery", {"callback_query_id": cb_id})
+                        if cb_data == "btn_stats":
+                            tg_api_call("sendMessage", {
+                                "chat_id": cb_chat,
+                                "text": get_live_stats_text(),
+                                "parse_mode": "HTML",
+                                "reply_markup": {
+                                    "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                }
+                            })
+                        elif cb_data == "btn_rules":
+                            tg_api_call("sendMessage", {
+                                "chat_id": cb_chat,
+                                "text": "ℹ️ <b>50 ta ovoz yig'ilgan har bir masala dushanba kuni direktor stoliga rasmiy taqdim etiladi.</b>",
+                                "parse_mode": "HTML"
+                            })
+
+            time.sleep(0.4)
+        except Exception as e:
+            time.sleep(2)
+
+def run_server(port=None):
+    if port is None:
+        port = int(os.environ.get('PORT', 3000))
     init_db()
+
+    # Start 24/7 Telegram Bot Daemon in the cloud!
+    bot_thread = threading.Thread(target=run_telegram_bot_daemon, daemon=True)
+    bot_thread.start()
+    print("🤖 Telegram Boti bulutda (Render) 24/7 orqa fonda ishga tushdi!")
+
     server_address = ('', port)
     httpd = HTTPServer(server_address, VoiceAPIHandler)
     print("=" * 60)
-    print(f"🚀 AKSS Voice Haqiqiy Backend Serveri ishga tushdi!")
+    print(f"🚀 AKSS Voice Haqiqiy Backend Serveri ishga tushdi! (Port: {port})")
     print(f"📍 Manzil: http://localhost:{port}/voice.html")
     print(f"💾 SQLite Ma'lumotlar bazasi: {DB_FILE}")
     print("=" * 60)
     httpd.serve_forever()
 
 if __name__ == '__main__':
-    run_server(3000)
+    run_server()
