@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AKSS Voice — Anonim Takliflar va Muammolar Radari</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Telegram WebApp Integration Script -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --accent-green: #10b981;
+      --accent-orange: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-red: #ef4444;
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-card);
+      padding: 16px 24px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    .brand-title h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title h1 span {
+      background: linear-gradient(90deg, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-council-report {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      padding: 9px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-council-report:hover {
+      background: rgba(245, 158, 11, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .btn-admin-auth {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-admin-auth:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+    }
+
+    .btn-admin-auth.active {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: #f59e0b;
+      color: #fbbf24;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+    }
+
+    .status-rejected {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    .tag-status.admin-clickable {
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+    }
+
+    .tag-status.admin-clickable:hover {
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      filter: brightness(1.2);
+    }
+
+    /* Status Picker Options */
+    .status-pick-option {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    .status-pick-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .status-pick-option .opt-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .status-pick-option .opt-text strong {
+      display: block;
+      font-size: 13.5px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .status-pick-option .opt-text span {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .opt-resolved .opt-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .opt-resolved:hover { border-color: rgba(16, 185, 129, 0.5); }
+
+    .opt-council .opt-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+    .opt-council:hover { border-color: rgba(59, 130, 246, 0.5); }
+
+    .opt-voting .opt-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .opt-voting:hover { border-color: rgba(245, 158, 11, 0.5); }
+
+    .opt-rejected .opt-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .opt-rejected:hover { border-color: rgba(239, 68, 68, 0.5); }
+
+    .btn-new-proposal {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-new-proposal:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+      width: 100%;
+    }
+
+    /* Banner / Slagan */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15));
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-text h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .hero-text p {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    .shield-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Metrics Summary Bar */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .stat-info h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* Filter & Controls Bar */
+    .controls-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border-card);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .category-select {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-card);
+      color: #cbd5e1;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Primary Section Switcher (Takliflar vs So'rovnomalar) */
+    .section-nav-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 26px;
+    }
+
+    .section-nav {
+      display: inline-flex;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-card);
+      padding: 6px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 22px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .section-btn:hover {
+      color: white;
+    }
+
+    .section-btn.active {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .badge-counter {
+      background: rgba(255, 255, 255, 0.2);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    /* Poll Cards Styling */
+    .poll-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 26px;
+      margin-bottom: 18px;
+      transition: all 0.25s ease;
+    }
+
+    .poll-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .poll-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .poll-organizer {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .poll-question {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .poll-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .poll-option-btn {
+      position: relative;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .poll-option-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .poll-option-btn.selected {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .poll-option-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.25), rgba(16, 185, 129, 0.2));
+      border-radius: 12px;
+      transition: width 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .poll-option-text {
+      position: relative;
+      z-index: 2;
+      font-size: 14px;
+      font-weight: 600;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .poll-option-stats {
+      position: relative;
+      z-index: 2;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #93c5fd;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .poll-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .poll-del-btn {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .poll-del-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+
+    /* Proposals Feed */
+    .proposals-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .proposal-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-card);
+      border-radius: 18px;
+      padding: 22px 24px;
+      display: flex;
+      gap: 20px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .proposal-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Upvote Module */
+    .vote-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .vote-box:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .vote-box.voted {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: #3b82f6;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .vote-box.voted i,
+    .vote-box.voted .vote-count {
+      color: white;
+    }
+
+    .vote-box i {
+      font-size: 16px;
+      color: #94a3b8;
+      transition: transform 0.2s ease;
+    }
+
+    .vote-box:hover i {
+      transform: translateY(-2px);
+      color: #60a5fa;
+    }
+
+    .vote-count {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Proposal Content */
+    .proposal-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .proposal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .proposal-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag-category {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-status {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-voting {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    .status-council {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #c084fc;
+    }
+
+    .status-resolved {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .proposal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .proposal-desc {
+      font-size: 13.8px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* Threshold Progress Bar */
+    .threshold-wrapper {
+      margin-top: auto;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .threshold-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .threshold-header .target {
+      color: #60a5fa;
+      font-weight: 700;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    .card-footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .anon-user {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    /* Modal Styling */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 22px;
+      width: 100%;
+      max-width: 580px;
+      padding: 30px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-head h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: #3b82f6;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .anon-guarantee-note {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none;
+      color: white;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    /* Director Briefing Report Sheet */
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .report-table th, .report-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .report-table th {
+      color: #94a3b8;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .print-btn {
+      background: #f59e0b;
+      color: #000;
+      font-weight: 700;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      margin-left: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-inner {
+        flex-direction: column;
+        gap: 14px;
+        align-items: stretch;
+      }
+      .header-actions {
+        justify-content: space-between;
+      }
+      .proposal-card {
+        flex-direction: column;
+        gap: 14px;
+      }
+      .vote-box {
+        flex-direction: row;
+        width: 100%;
+        height: 44px;
+        gap: 12px;
+      }
+      .vote-count {
+        margin-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bullhorn"></i>
+        </div>
+        <div class="brand-title">
+          <h1>AKSS <span>Voice</span></h1>
+          <p>Muhammad al-Xorazmiy ixtisoslashtirilgan maktabi • Student Council Portali</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-admin-auth" id="btn-admin-mode" onclick="toggleAdminMode()" title="Maktab ma'muriyati yoki Student Council uchun">
+          <i class="fa-solid fa-lock"></i>
+          <span id="admin-mode-text">Admin Kirish</span>
+        </button>
+        <button class="btn-council-report" id="btn-open-report">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <span>Dushanba Hisoboti (Direktorga)</span>
+        </button>
+        <button class="btn-new-proposal" id="btn-open-new-modal">
+          <i class="fa-solid fa-plus"></i>
+          <span>Anonim Taklif Yozish</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main>
+
+    <!-- Slagan & Safety Banner -->
+    <div class="hero-banner">
+      <div class="hero-text">
+        <h2>"Muammolarni orqadan gapirish bilan emas, raqamli ovoz bilan hal qilamiz."</h2>
+        <p>
+          Maktabimizdagi har qanday kamchilik, oshxona, Wi-Fi yoki o'quv sharoitlari bo'yicha taklifingizni anonim qoldiring. 
+          <strong>50 ta ovoz</strong> to'plagan har bir masala Student Council orqali to'g'ridan-to'g'ri maktab direktoriga taqdim etiladi.
+        </p>
+      </div>
+      <div class="shield-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>100% Anonimlik Kafolatlangan</span>
+      </div>
+    </div>
+
+    <!-- Live Statistics Summary -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="stat-total">14 ta</h3>
+          <p>Jami takliflar</p>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="stat-active">3 ta</h3>
+          <p>Direktor stolida (50+ ovoz)</p>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="stat-resolved">8 ta</h3>
+          <p>To'liq hal etilgan muammolar</p>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;">
+          <i class="fa-solid fa-check-to-slot"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="stat-votes">680+</h3>
+          <p>O'quvchilar bergan ovozlari</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Section Switcher -->
+    <div class="section-nav-wrap">
+      <div class="section-nav">
+        <button class="section-btn active" id="sec-btn-proposals" onclick="switchSection('proposals')">
+          <i class="fa-solid fa-bullhorn"></i>
+          <span>Takliflar & Muammolar</span>
+          <span class="badge-counter" id="badge-proposals-count">14</span>
+        </button>
+        <button class="section-btn" id="sec-btn-polls" onclick="switchSection('polls')">
+          <i class="fa-solid fa-square-poll-vertical"></i>
+          <span>Maktab So'rovnomalari (Polls)</span>
+          <span class="badge-counter" id="badge-polls-count" style="background: rgba(16, 185, 129, 0.3); color: #34d399;">3 ta faol</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 1: PROPOSALS -->
+    <div id="section-proposals">
+      <!-- Filter & Sort Bar -->
+      <div class="controls-strip">
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="trending">
+            <i class="fa-solid fa-fire"></i> Trenddagi (Eng ko'p ovoz)
+          </button>
+          <button class="tab-btn" data-filter="council">
+            <i class="fa-solid fa-gavel"></i> Direktor stolida (50+)
+          </button>
+          <button class="tab-btn" data-filter="resolved">
+            <i class="fa-solid fa-check-double"></i> Bajarilganlar
+          </button>
+          <button class="tab-btn" data-filter="latest">
+            <i class="fa-solid fa-clock"></i> Eng yangi
+          </button>
+        </div>
+
+        <select class="category-select" id="category-filter">
+          <option value="all">Barcha yo'nalishlar</option>
+          <option value="it">Wi-Fi & IT Uskunalar</option>
+          <option value="oshxona">Oshxona & Taomlar</option>
+          <option value="kutubxona">Kutubxona & SAT/IELTS</option>
+          <option value="sharoit">Sinfxonalar & Sharoit</option>
+          <option value="sport">Sport & Salomatlik</option>
+        </select>
+      </div>
+
+      <!-- Feed List of Proposals -->
+      <div class="proposals-grid" id="proposals-feed">
+        <!-- Generated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- SECTION 2: POLLS -->
+    <div id="section-polls" style="display: none;">
+      <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: #fff;"><i class="fa-solid fa-chart-pie" style="color: #60a5fa; margin-right: 8px;"></i> Rasmiy Maktab So'rovnomalari</h3>
+          <p style="font-size: 12.5px; color: #94a3b8; margin-top: 3px;">Ma'muriyat va Student Council tomonidan o'quvchilar fikrini o'rganish uchun e'lon qilingan so'rovnomalar.</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button onclick="openNewPollModal()" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 9px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>+ Yangi So'rovnoma (Admin)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="polls-grid" id="polls-feed">
+        <!-- Generated by JavaScript -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL 1: YANGA TAKLIF QO'SHISH -->
+  <div class="modal-backdrop" id="modal-new-proposal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-pen-to-square" style="color: #60a5fa;"></i> Anonim Taklif Qoldirish</h3>
+        <button class="modal-close" id="btn-close-new-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="new-proposal-form">
+        <div class="anon-guarantee-note">
+          <i class="fa-solid fa-user-secret" style="font-size: 18px;"></i>
+          <span>Ismingiz, sinfingiz yoki IP manzilingiz saqlanmaydi. O'zingizni erkin ifoda eting!</span>
+        </div>
+
+        <div class="form-group">
+          <label>Kategoriya (Yo'nalish):</label>
+          <select class="form-select" id="new-cat" required>
+            <option value="it">Wi-Fi & IT Uskunalar</option>
+            <option value="oshxona">Oshxona & Taomlar</option>
+            <option value="kutubxona">Kutubxona & SAT/IELTS</option>
+            <option value="sharoit">Sinfxonalar & Sharoit</option>
+            <option value="sport">Sport & Salomatlik</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Muammoning qisqa nomi (Sarlavha):</label>
+          <input type="text" class="form-input" id="new-title" placeholder="Masalan: 3-qavat IT Labdagi Wi-Fi router qotib qolmoqda" required />
+        </div>
+
+        <div class="form-group">
+          <label>Muammo tavsifi va taklif etilayotgan yechim:</label>
+          <textarea class="form-textarea" id="new-desc" placeholder="Muammoni aniqroq tushuntiring va maktab ma'muriyati buni qanday tuzatishi mumkinligini yozing..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Anonim tarzda platformaga yuborish</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: DIREKTOR VA MA'MURIYAT UCHUN DUSHANBA HISOBOTI -->
+  <div class="modal-backdrop" id="modal-director-report">
+    <div class="modal-box" style="max-width: 720px;">
+      <div class="modal-head">
+        <div>
+          <h3><i class="fa-solid fa-file-shield" style="color: #f59e0b;"></i> Student Council Haftalik Hisoboti</h3>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktab direktori qabuliga</p>
+        </div>
+        <button class="modal-close" id="btn-close-report-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.6;">
+        <strong>Hurmatli Maktab Ma'muriyati!</strong><br />
+        Quyidagi muammolar maktab o'quvchilari tomonidan anonim bildirilgan bo'lib, o'quvchilar hamjamiyatida 
+        <strong style="color: #fbbf24;">50 tadan ortiq haqiqiy ovoz</strong> to'plagan holda rasmiy ko'rib chiqish darajasiga yetgan.
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Yo'nalish</th>
+            <th>Muammo va Taklif</th>
+            <th>Ovozlar</th>
+            <th>Holati</th>
+          </tr>
+        </thead>
+        <tbody id="director-table-body">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+
+      <button class="print-btn" onclick="window.print()">
+        <i class="fa-solid fa-print"></i>
+        <span>Chop etish / PDF eksport qilish</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 3: YANGI SO'ROVNOMA YARATISH (ADMIN / KENGASH) -->
+  <div class="modal-backdrop" id="modal-new-poll">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-square-poll-vertical" style="color: #10b981;"></i> Yangi So'rovnoma Ochish</h3>
+        <button class="modal-close" onclick="closeNewPollModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="new-poll-form" onsubmit="handleCreatePoll(event)">
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); padding: 12px 16px; border-radius: 12px; font-size: 12.5px; color: #93c5fd; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-user-shield" style="font-size: 16px;"></i>
+          <span>Ushbu bo'lim faqat O'quvchilar Kengashi va Ma'muriyat a'zolari uchun. So'rovnoma butun maktabga e'lon qilinadi.</span>
+        </div>
+
+        <div class="form-group">
+          <label>Tashkilotchi (Kim nomidan e'lon qilinmoqda?):</label>
+          <select class="form-select" id="poll-organizer" required>
+            <option value="Student Council & Ma'muriyat">Student Council & Ma'muriyat</option>
+            <option value="Maktab Ma'muriyati">Maktab Ma'muriyati</option>
+            <option value="AKSS IT Qo'mitasi">AKSS IT Qo'mitasi</option>
+            <option value="Oshxona Komissiyasi">Oshxona Komissiyasi</option>
+            <option value="Kutubxona & Ilmiy Kengash">Kutubxona & Ilmiy Kengash</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Yo'nalish (Kategoriya):</label>
+          <select class="form-select" id="poll-category" required>
+            <option value="Maktab Tartibi">Maktab Tartibi & Kiyim</option>
+            <option value="Texnologiya & IT">Texnologiya & Hackathonlar</option>
+            <option value="Oshxona & Taomlar">Oshxona & Taomlar</option>
+            <option value="Dars Jadvali & O'qish">Dars Jadvali & O'qish</option>
+            <option value="Sport & Tadbirlar">Sport & Tadbirlar</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>So'rovnoma Savoli (Sarlavha):</label>
+          <input type="text" class="form-input" id="poll-title" placeholder="Masalan: Qishki ta'tilda maktabda mini-lager o'tkazilsinmi?" required />
+        </div>
+
+        <div class="form-group">
+          <label>Variantlar (Kamida 2 ta):</label>
+          <div id="poll-options-container" style="display: flex; flex-direction: column; gap: 8px;">
+            <input type="text" class="form-input poll-opt-input" placeholder="1-variant: Masalan, Ha, to'liq qo'llab-quvvatlayman" required />
+            <input type="text" class="form-input poll-opt-input" placeholder="2-variant: Masalan, Yo'q, qatnashmayman" required />
+          </div>
+          <button type="button" onclick="addPollOptionField()" style="margin-top: 8px; background: rgba(255,255,255,0.06); border: 1px dashed rgba(255,255,255,0.2); color: #60a5fa; padding: 8px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-plus"></i> Variant qo'shish
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-shield-halved" style="color: #f59e0b;"></i> Maxfiy Kengash Kaliti (Secret Admin Key):</label>
+          <input type="password" class="form-input" id="poll-admin-pin" placeholder="Faqat Student Council raisi uchun..." required />
+        </div>
+
+        <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-rocket"></i>
+          <span>So'rovnomani butun maktabga e'lon qilish</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: MAXFIY KODNI KIRITISH (PASSPORTLI / YASHIRIN INPUT) -->
+  <div class="modal-backdrop" id="modal-admin-auth">
+    <div class="modal-box" style="max-width: 420px; text-align: center;">
+      <div style="width: 56px; height: 56px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 24px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 6px;" id="auth-modal-title">Admin Tasdiqlash</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 22px;" id="auth-modal-desc">Davom etish uchun Maxfiy Admin Kodini kiriting:</p>
+
+      <form onsubmit="submitAdminAuth(event)">
+        <div style="position: relative; margin-bottom: 20px;">
+          <input 
+            type="password" 
+            id="admin-auth-input" 
+            class="form-input" 
+            style="text-align: center; font-size: 18px; letter-spacing: 4px; padding: 14px 44px 14px 14px; font-family: 'JetBrains Mono', monospace;" 
+            placeholder="••••••••" 
+            autocomplete="off" 
+            required 
+          />
+          <button 
+            type="button" 
+            onclick="togglePasswordVisibility()" 
+            style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px;">
+            <i class="fa-solid fa-eye" id="auth-eye-icon"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" onclick="closeAdminAuthModal()" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer;">Bekor qilish</button>
+          <button type="submit" style="flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: white; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">Tasdiqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: TAKLIF HOLATINI TANLASH (STATUS PICKER) -->
+  <div class="modal-backdrop" id="modal-status-picker">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-sliders" style="color: #60a5fa;"></i> Taklif Holatini Belgilash</h3>
+        <button class="modal-close" onclick="closeStatusPicker()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 18px; line-height: 1.4;" id="status-picker-title">Taklif nomi...</p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="status-pick-option opt-resolved" onclick="applyStatusChoice('resolved')">
+          <div class="opt-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="opt-text">
+            <strong>Hal etildi (Bajarildi)</strong>
+            <span>Muammo maktab tomonidan to'liq bartaraf etildi</span>
+          </div>
+        </button>
+
+        <button class="status-pick-option opt-council" onclick="applyStatusChoice('council')">
+          <div class="opt-icon"><i class="fa-solid fa-gavel"></i></div>
+          <div class="opt-text">
+            <strong>Direktor stolida</strong>
+            <span>Masala ma'muriyat tomonidan ko'rib chiqilmoqda</span>
+          </div>
+        </button>
+
+        <button class="status-pick-option opt-voting" onclick="applyStatusChoice('voting')">
+          <div class="opt-icon"><i class="fa-solid fa-spinner"></i></div>
+          <div class="opt-text">
+            <strong>Ovoz yig'ilmoqda</strong>
+            <span>O'quvchilar ovoz berish jarayonida</span>
+          </div>
+        </button>
+
+        <button class="status-pick-option opt-rejected" onclick="applyStatusChoice('rejected')">
+          <div class="opt-icon"><i class="fa-solid fa-ban"></i></div>
+          <div class="opt-text">
+            <strong>Rad etildi / Kutilmoqda</strong>
+            <span>Byudjet yoki texnik sababga ko'ra hozircha imkoni yo'q</span>
+          </div>
+        </button>
+      </div>
+
+      <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+        <button onclick="deleteCurrentProposal()" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-trash-can"></i> Taklifni o'chirish
+        </button>
+        <button onclick="closeStatusPicker()" style="background: transparent; border: none; color: #94a3b8; font-size: 13px; cursor: pointer;">Bekor qilish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic (Connected to Real Backend & Telegram) -->
+  <script>
+    // --- USER IDENTITY RESOLUTION (Telegram WebApp or Device UUID) ---
+    let userId = 'anon_guest';
+    const isTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user);
+
+    if (isTelegram) {
+      userId = 'tg_' + window.Telegram.WebApp.initDataUnsafe.user.id;
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    } else {
+      userId = localStorage.getItem('akss_device_id');
+      if (!userId) {
+        userId = 'dev_' + Math.random().toString(36).substring(2, 14) + Date.now().toString(36);
+        localStorage.setItem('akss_device_id', userId);
+      }
+    }
+
+    // --- SAMPLE FALLBACK SEED DATA (If Server is offline) ---
+    const DEFAULT_PROPOSALS = [
+      {
+        id: 'prop-1',
+        title: "3-qavat IT Lab 2 dagi Wi-Fi router tezligini oshirish va qayta sozlash",
+        desc: "Dasturlash darslarida (C++ va Python paketlarini yuklashda) internet tezligi tushib ketmoqda. Har bir darsda 30 ta o'quvchi bir vaqtda ulanganda router qizib o'chib qolmoqda. Bitta qo'shimcha Gigabit switch yoki 5GHz access point o'rnatish taklif etiladi.",
+        category: "it",
+        categoryName: "Wi-Fi & IT Uskunalar",
+        votes: 78,
+        status: "council",
+        date: "3 kun oldin",
+        author: "Anonim O'quvchi (10-sinf)"
+      },
+      {
+        id: 'prop-2',
+        title: "Oshxonadagi navbatni kamaytirish uchun tanaffusdan 15 daqiqa oldin Telegram orqali buyurtma berish",
+        desc: "Katta tanaffusda 15 daqiqa davomida kassada uzun navbat hosil bo'lmoqda. Ko'pchilik ovqat yeb ulgurmay qolyapti. Oshxona uchun oddiy menyu-bot yaratib, o'quvchilar oldindan band qilib qo'yadigan tizim kiritilsa yaxshi bo'lardi.",
+        category: "oshxona",
+        categoryName: "Oshxona & Taomlar",
+        votes: 64,
+        status: "council",
+        date: "5 kun oldin",
+        author: "Anonim O'quvchi (9-sinf)"
+      },
+      {
+        id: 'prop-3',
+        title: "Kutubxonaga xalqaro SAT Math va yangi C++ / Algoritmlar kitoblarini qo'shish",
+        desc: "Kutubxonamizda badiiy kitoblar ko'p, lekin New Uzbekistan va xorijiy universitetlarga tayyorlanish uchun yangi 2024–2025 Digital SAT qo'llanmalari va IOI algoritmlari bo'yicha kitoblar yetishmayapti.",
+        category: "kutubxona",
+        categoryName: "Kutubxona & SAT/IELTS",
+        votes: 48,
+        status: "voting",
+        date: "1 kun oldin",
+        author: "Anonim O'quvchi (11-sinf)"
+      },
+      {
+        id: 'prop-4',
+        title: "Sport zalidagi stol tennisi raketkalari va to'rlarini yangilash",
+        desc: "Darsdan keyingi tanaffusda o'quvchilar stol tennisi o'ynashni xohlashadi, ammo mavjud 4 ta raketkaning rezinkalari ko'chib ketgan. Student Council hisobidan yangi 4 juft sifatli raketka olib berilishi so'raladi.",
+        category: "sport",
+        categoryName: "Sport & Salomatlik",
+        votes: 82,
+        status: "resolved",
+        date: "2 hafta oldin",
+        author: "Anonim O'quvchi (8-sinf)"
+      },
+      {
+        id: 'prop-5',
+        title: "2-qavatdagi sinfxonalar proyektorlariga HDMI kabellari va pultlarini sozlash",
+        desc: "Prezentatsiya darslarida o'qituvchilar doim HDMI kabel qidirib vaqt yo'qotmoqda. Har bir sinf xonasiga bittadan qattiq mahkamlangan kabel va pult qo'yilsa darslar tezroq boshlanardi.",
+        category: "sharoit",
+        categoryName: "Sinfxonalar & Sharoit",
+        votes: 38,
+        status: "voting",
+        date: "Bugun",
+        author: "Anonim O'quvchi (7-sinf)"
+      }
+    ];
+
+    let proposals = JSON.parse(localStorage.getItem('akss_proposals')) || DEFAULT_PROPOSALS;
+    let userVoted = JSON.parse(localStorage.getItem('akss_user_voted')) || {};
+    let backendOnline = false;
+
+    // --- SAMPLE SEED POLLS (Fallback if server offline) ---
+    const DEFAULT_POLLS = [
+      {
+        id: 'poll-1',
+        title: "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
+        organizer: "Student Council & Ma'muriyat",
+        category: "Maktab Tartibi",
+        options: [
+          { text: "Ha, to'liq qo'llab-quvvatlayman (Hudi/Jinsi)", votes: 142 },
+          { text: "Faqat to'q rangli erkin kiyim ruxsat etilsin", votes: 35 },
+          { text: "Klassik forma qolgani ma'qul", votes: 14 }
+        ],
+        totalVotes: 191,
+        myChoice: null,
+        status: "active",
+        date: "2 kun oldin"
+      },
+      {
+        id: 'poll-2',
+        title: "Keyingi oylik maktab Hackathon musobaqasi qaysi yo'nalishda bo'lsin?",
+        organizer: "AKSS IT Qo'mitasi",
+        category: "Texnologiya & IT",
+        options: [
+          { text: "Sun'iy Intellekt va AI Agentlar (LLM)", votes: 118 },
+          { text: "Telegram Botlar & WebApp (TWA)", votes: 84 },
+          { text: "Kiberxavfsizlik & CTF (Ethical Hacking)", votes: 59 }
+        ],
+        totalVotes: 261,
+        myChoice: null,
+        status: "active",
+        date: "4 kun oldin"
+      },
+      {
+        id: 'poll-3',
+        title: "Oshxonadagi tushlik taomlari menyusiga qaysi yangi taom qo'shilsin?",
+        organizer: "Oshxona Komissiyasi",
+        category: "Oshxona & Taomlar",
+        options: [
+          { text: "Lag'mon & Qovurma", votes: 96 },
+          { text: "Mini Pitsa & Toster", votes: 72 },
+          { text: "Tovuqli Salat & Grechka", votes: 41 }
+        ],
+        totalVotes: 209,
+        myChoice: null,
+        status: "active",
+        date: "6 kun oldin"
+      }
+    ];
+
+    let polls = JSON.parse(localStorage.getItem('akss_polls')) || DEFAULT_POLLS;
+    let userPollChoices = JSON.parse(localStorage.getItem('akss_poll_choices')) || {};
+
+    // --- SYNC WITH REAL SERVER BACKEND ---
+    async function syncWithServer() {
+      try {
+        const res = await fetch('/api/proposals', {
+          headers: { 'X-User-Id': userId }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.proposals) {
+            proposals = data.proposals;
+            backendOnline = true;
+          }
+        }
+
+        // Fetch my votes from SQLite
+        const votesRes = await fetch('/api/my-votes', {
+          headers: { 'X-User-Id': userId }
+        });
+        if (votesRes.ok) {
+          const votesData = await votesRes.json();
+          userVoted = {};
+          (votesData.voted_ids || []).forEach(id => {
+            userVoted[id] = true;
+          });
+        }
+
+        // Fetch polls from SQLite
+        const pollsRes = await fetch('/api/polls', {
+          headers: { 'X-User-Id': userId }
+        });
+        if (pollsRes.ok) {
+          const pollsData = await pollsRes.json();
+          if (pollsData.polls) {
+            polls = pollsData.polls;
+            polls.forEach(p => {
+              if (p.myChoice !== null && p.myChoice !== undefined) {
+                userPollChoices[p.id] = p.myChoice;
+              }
+            });
+          }
+        }
+      } catch (err) {
+        // Backend not running, use local storage
+        backendOnline = false;
+      }
+      updateMetrics();
+      renderFeed();
+      renderPolls();
+    }
+
+    // --- SECTION SWITCHER (Proposals vs Polls) ---
+    window.switchSection = function(sec) {
+      document.getElementById('sec-btn-proposals').classList.toggle('active', sec === 'proposals');
+      document.getElementById('sec-btn-polls').classList.toggle('active', sec === 'polls');
+
+      document.getElementById('section-proposals').style.display = sec === 'proposals' ? 'block' : 'none';
+      document.getElementById('section-polls').style.display = sec === 'polls' ? 'block' : 'none';
+
+      if (sec === 'polls') {
+        renderPolls();
+      } else {
+        renderFeed();
+      }
+    };
+
+    // --- RENDER POLLS ---
+    function renderPolls() {
+      const feed = document.getElementById('polls-feed');
+      if (!feed) return;
+      feed.innerHTML = '';
+
+      polls.forEach(poll => {
+        const myChoice = userPollChoices[poll.id] !== undefined ? userPollChoices[poll.id] : poll.myChoice;
+        const hasVoted = myChoice !== null && myChoice !== undefined;
+        const totalVotes = poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
+
+        const card = document.createElement('div');
+        card.className = 'poll-card';
+
+        let optionsHtml = '';
+        poll.options.forEach((opt, idx) => {
+          const isSelected = hasVoted && myChoice === idx;
+          const pct = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
+
+          optionsHtml += `
+            <div class="poll-option-btn ${isSelected ? 'selected' : ''}" onclick="votePoll('${poll.id}', ${idx})">
+              ${hasVoted ? `<div class="poll-option-fill" style="width: ${pct}%;"></div>` : ''}
+              <div class="poll-option-text">
+                <i class="fa-solid ${isSelected ? 'fa-circle-check' : 'fa-circle-notch'}" style="color: ${isSelected ? '#34d399' : '#64748b'};"></i>
+                <span>${opt.text}</span>
+              </div>
+              <div class="poll-option-stats">
+                ${hasVoted ? `<span>${pct}% (${opt.votes})</span>` : `<span>Ovoz berish</span>`}
+              </div>
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="poll-header">
+            <span class="poll-organizer"><i class="fa-solid fa-building-columns"></i> ${poll.organizer}</span>
+            <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700;">${poll.category}</span>
+          </div>
+          <h3 class="poll-question">${poll.title}</h3>
+          <div class="poll-options-list">
+            ${optionsHtml}
+          </div>
+          <div class="poll-footer">
+            <span><i class="fa-solid fa-users"></i> Jami: <strong>${totalVotes} ta o'quvchi</strong> qatnashdi</span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span><i class="fa-regular fa-clock"></i> ${poll.date}</span>
+              <button class="poll-del-btn" onclick="handleDeletePoll('${poll.id}')" title="So'rovnomani o'chirish (Admin)">
+                <i class="fa-solid fa-trash-can"></i> O'chirish
+              </button>
+            </div>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    window.votePoll = async function(pollId, optionIndex) {
+      const poll = polls.find(p => p.id === pollId);
+      if (!poll) return;
+
+      const prevChoice = userPollChoices[pollId];
+      if (prevChoice === optionIndex) return;
+
+      if (prevChoice !== undefined && prevChoice !== null) {
+        poll.options[prevChoice].votes = Math.max(0, poll.options[prevChoice].votes - 1);
+      }
+      poll.options[optionIndex].votes = (poll.options[optionIndex].votes || 0) + 1;
+      userPollChoices[pollId] = optionIndex;
+
+      localStorage.setItem('akss_polls', JSON.stringify(polls));
+      localStorage.setItem('akss_poll_choices', JSON.stringify(userPollChoices));
+      renderPolls();
+
+      try {
+        const res = await fetch(`/api/poll-vote/${pollId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({ optionIndex: optionIndex })
+        });
+        if (res.ok) {
+          const resData = await res.json();
+          poll.options = resData.options;
+          poll.totalVotes = resData.totalVotes;
+          localStorage.setItem('akss_polls', JSON.stringify(polls));
+          renderPolls();
+        }
+      } catch (err) {
+        // offline
+      }
+    };
+
+    // --- ADMIN NEW POLL MODAL HANDLERS ---
+    window.openNewPollModal = function() {
+      document.getElementById('modal-new-poll').classList.add('active');
+    };
+
+    window.closeNewPollModal = function() {
+      document.getElementById('modal-new-poll').classList.remove('active');
+    };
+
+    window.handleDeletePoll = async function(pollId) {
+      requestAdminAuth("So'rovnomani O'chirish", "Ushbu so'rovnomani butunlay o'chirish uchun Maxfiy Admin Kodini kiriting:", async () => {
+        if (!confirm("Haqiqatdan ham ushbu so'rovnomani o'chirmoqchimisiz?")) {
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/poll-delete/${pollId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-User-Id': userId
+            },
+            body: JSON.stringify({ adminPin: 'XORAZMIY_780' })
+          });
+
+          if (res.ok) {
+            polls = polls.filter(p => p.id !== pollId);
+            localStorage.setItem('akss_polls', JSON.stringify(polls));
+            renderPolls();
+            alert("✅ So'rovnoma muvaffaqiyatli o'chirildi!");
+            return;
+          } else {
+            const errData = await res.json();
+            alert(errData.error || "O'chirishda xatolik yuz berdi");
+          }
+        } catch (err) {
+          // offline fallback
+          polls = polls.filter(p => p.id !== pollId);
+          localStorage.setItem('akss_polls', JSON.stringify(polls));
+          renderPolls();
+          alert("✅ So'rovnoma o'chirildi!");
+        }
+      });
+    };
+
+    window.addPollOptionField = function() {
+      const container = document.getElementById('poll-options-container');
+      const count = container.children.length + 1;
+      if (count > 6) {
+        alert("So'rovnomada ko'pi bilan 6 ta variant bo'lishi mumkin.");
+        return;
+      }
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'form-input poll-opt-input';
+      input.placeholder = `${count}-variant`;
+      input.required = true;
+      container.appendChild(input);
+    };
+
+    window.handleCreatePoll = async function(e) {
+      e.preventDefault();
+      const title = document.getElementById('poll-title').value.trim();
+      const organizer = document.getElementById('poll-organizer').value;
+      const category = document.getElementById('poll-category').value;
+      const adminPin = document.getElementById('poll-admin-pin').value.trim();
+
+      const optionInputs = document.querySelectorAll('.poll-opt-input');
+      const options = [];
+      optionInputs.forEach(inp => {
+        const val = inp.value.trim();
+        if (val) options.push({ text: val, votes: 0 });
+      });
+
+      if (options.length < 2) {
+        alert("Kamida 2 ta variant yozishingiz kerak!");
+        return;
+      }
+
+      // Client-side offline fallback check
+      if (!backendOnline && adminPin !== 'XORAZMIY_780') {
+        alert("Xato Maxfiy Kalit! Faqat Student Council vakillari so'rovnoma ochishi mumkin.");
+        return;
+      }
+
+      const payload = {
+        title: title,
+        organizer: organizer,
+        category: category,
+        options: options,
+        adminPin: adminPin
+      };
+
+      try {
+        const res = await fetch('/api/polls', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData.poll) {
+            polls.unshift(resData.poll);
+          }
+        } else {
+          const errData = await res.json();
+          alert(errData.error || "Xatolik yuz berdi");
+          return;
+        }
+      } catch (err) {
+        // offline fallback
+        const newPoll = {
+          id: 'poll-' + Date.now(),
+          title: title,
+          organizer: organizer,
+          category: category,
+          options: options,
+          totalVotes: 0,
+          myChoice: null,
+          status: 'active',
+          date: 'Hozirgina'
+        };
+        polls.unshift(newPoll);
+      }
+
+      localStorage.setItem('akss_polls', JSON.stringify(polls));
+      renderPolls();
+      document.getElementById('new-poll-form').reset();
+      closeNewPollModal();
+      alert("🎉 Yangi so'rovnoma muvaffaqiyatli butun maktabga e'lon qilindi!");
+    };
+
+    function saveState() {
+      localStorage.setItem('akss_proposals', JSON.stringify(proposals));
+      localStorage.setItem('akss_user_voted', JSON.stringify(userVoted));
+      updateMetrics();
+      renderFeed();
+    }
+
+    // --- RENDER PROPOSALS ---
+    let currentFilter = 'trending';
+    let currentCategory = 'all';
+
+    function renderFeed() {
+      const feed = document.getElementById('proposals-feed');
+      feed.innerHTML = '';
+
+      let list = [...proposals];
+
+      if (currentCategory !== 'all') {
+        list = list.filter(p => p.category === currentCategory);
+      }
+
+      if (currentFilter === 'trending') {
+        list.sort((a, b) => b.votes - a.votes);
+      } else if (currentFilter === 'council') {
+        list = list.filter(p => p.votes >= 50 || p.status === 'council');
+      } else if (currentFilter === 'resolved') {
+        list = list.filter(p => p.status === 'resolved');
+      }
+
+      if (list.length === 0) {
+        feed.innerHTML = `
+          <div style="text-align:center; padding: 50px 20px; color: #94a3b8;">
+            <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 12px; color: #475569;"></i>
+            <p>Ushbu bo'limda hozircha hech qanday taklif topilmadi.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(item => {
+        const hasVoted = !!userVoted[item.id];
+        const progressPct = Math.min(Math.round((item.votes / 50) * 100), 100);
+
+        let statusBadge = '';
+        let badgeIcon = '';
+        let badgeText = '';
+        let badgeClass = '';
+
+        if (item.status === 'resolved') {
+          badgeIcon = '<i class="fa-solid fa-circle-check"></i>';
+          badgeText = 'Hal etildi';
+          badgeClass = 'status-resolved';
+        } else if (item.status === 'rejected') {
+          badgeIcon = '<i class="fa-solid fa-ban"></i>';
+          badgeText = 'Rad etildi';
+          badgeClass = 'status-rejected';
+        } else if (item.votes >= 50 || item.status === 'council') {
+          badgeIcon = '<i class="fa-solid fa-gavel"></i>';
+          badgeText = 'Direktor stolida (50+)';
+          badgeClass = 'status-council';
+        } else {
+          badgeIcon = '<i class="fa-solid fa-spinner"></i>';
+          badgeText = 'Ovoz yig\'ilmoqda';
+          badgeClass = 'status-voting';
+        }
+
+        const editHint = isAdminMode ? ' <i class="fa-solid fa-pen-to-square" style="font-size:10px; margin-left:5px; opacity:0.8;"></i>' : '';
+        statusBadge = `<span class="tag-status ${badgeClass} admin-clickable" onclick="openStatusPicker('${item.id}')" title="Holatni o'zgartirish uchun bosing">${badgeIcon} ${badgeText}${editHint}</span>`;
+
+        const card = document.createElement('div');
+        card.className = 'proposal-card';
+        card.innerHTML = `
+          <div class="vote-box ${hasVoted ? 'voted' : ''}" onclick="toggleVote('${item.id}')">
+            <i class="fa-solid fa-chevron-up"></i>
+            <span class="vote-count">${item.votes}</span>
+          </div>
+
+          <div class="proposal-body">
+            <div class="proposal-header">
+              <div class="proposal-tags">
+                <span class="tag-category">${item.categoryName}</span>
+                ${statusBadge}
+              </div>
+            </div>
+
+            <h3 class="proposal-title">${item.title}</h3>
+            <p class="proposal-desc">${item.desc}</p>
+
+            <div class="threshold-wrapper">
+              <div class="threshold-header">
+                <span>Direktor qabuliga kirish: <strong>${item.votes} / 50 ovoz</strong></span>
+                <span class="target">${progressPct}%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${progressPct}%;"></div>
+              </div>
+            </div>
+
+            <div class="card-footer-meta">
+              <span class="anon-user"><i class="fa-solid fa-user-secret"></i> ${item.author}</span>
+              <span><i class="fa-regular fa-clock"></i> ${item.date}</span>
+            </div>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    // --- CUSTOM SECURE ADMIN AUTH MODAL (MASKED PASSWORD) ---
+    let authSuccessCallback = null;
+
+    function requestAdminAuth(title, desc, onSuccess) {
+      authSuccessCallback = onSuccess;
+      document.getElementById('auth-modal-title').innerText = title || "Admin Tasdiqlash";
+      document.getElementById('auth-modal-desc').innerText = desc || "Davom etish uchun Maxfiy Admin Kodini kiriting:";
+      const inp = document.getElementById('admin-auth-input');
+      inp.value = '';
+      inp.type = 'password';
+      document.getElementById('auth-eye-icon').className = 'fa-solid fa-eye';
+      document.getElementById('modal-admin-auth').classList.add('active');
+      setTimeout(() => inp.focus(), 80);
+    }
+
+    window.closeAdminAuthModal = function() {
+      document.getElementById('modal-admin-auth').classList.remove('active');
+      authSuccessCallback = null;
+    };
+
+    window.submitAdminAuth = function(e) {
+      e.preventDefault();
+      const entered = document.getElementById('admin-auth-input').value.trim();
+      if (entered === 'XORAZMIY_780') {
+        const cb = authSuccessCallback;
+        closeAdminAuthModal();
+        if (cb) cb();
+      } else {
+        alert("❌ Xato Maxfiy Kod!");
+        document.getElementById('admin-auth-input').value = '';
+        document.getElementById('admin-auth-input').focus();
+      }
+    };
+
+    window.togglePasswordVisibility = function() {
+      const inp = document.getElementById('admin-auth-input');
+      const icon = document.getElementById('auth-eye-icon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    };
+
+    // --- STATUS PICKER MODAL LOGIC (CLEAN & MINIMAL) ---
+    let activePickingProposalId = null;
+
+    window.openStatusPicker = function(propId) {
+      activePickingProposalId = propId;
+      const item = proposals.find(p => p.id === propId);
+      if (!item) return;
+
+      if (!isAdminMode) {
+        requestAdminAuth("Holatni O'zgartirish", "Ushbu taklif holatini belgilash uchun Maxfiy Kodni kiriting:", () => {
+          isAdminMode = true;
+          sessionStorage.setItem('akss_admin_mode', 'true');
+          updateAdminButtonUI();
+          renderFeed();
+          openStatusPicker(propId);
+        });
+        return;
+      }
+
+      document.getElementById('status-picker-title').innerText = `"${item.title}"`;
+      document.getElementById('modal-status-picker').classList.add('active');
+    };
+
+    window.closeStatusPicker = function() {
+      document.getElementById('modal-status-picker').classList.remove('active');
+      activePickingProposalId = null;
+    };
+
+    window.applyStatusChoice = async function(newStatus) {
+      if (!activePickingProposalId) return;
+      const propId = activePickingProposalId;
+      closeStatusPicker();
+      await changeProposalStatus(propId, newStatus);
+    };
+
+    window.deleteCurrentProposal = async function() {
+      if (!activePickingProposalId) return;
+      const propId = activePickingProposalId;
+      closeStatusPicker();
+      await handleDeleteProposal(propId);
+    };
+
+    // --- ADMIN MODE TOGGLE ---
+    let isAdminMode = sessionStorage.getItem('akss_admin_mode') === 'true';
+
+    window.toggleAdminMode = function() {
+      if (isAdminMode) {
+        isAdminMode = false;
+        sessionStorage.removeItem('akss_admin_mode');
+        updateAdminButtonUI();
+        renderFeed();
+        return;
+      }
+
+      requestAdminAuth("Admin Rejimi", "Student Council boshqaruviga kirish uchun Maxfiy Kodni kiriting:", () => {
+        isAdminMode = true;
+        sessionStorage.setItem('akss_admin_mode', 'true');
+        updateAdminButtonUI();
+        renderFeed();
+        alert("👑 Admin rejimi faollashdi! Endi taklif ustiga bosib uning holatini o'zgartirishingiz mumkin.");
+      });
+    };
+
+    function updateAdminButtonUI() {
+      const btn = document.getElementById('btn-admin-mode');
+      if (!btn) return;
+      if (isAdminMode) {
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fa-solid fa-crown" style="color: #fbbf24;"></i> <span>Admin (Chiqish)</span>';
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> <span>Admin Kirish</span>';
+      }
+    }
+
+    window.changeProposalStatus = async function(propId, newStatus) {
+      const item = proposals.find(p => p.id === propId);
+      if (!item) return;
+
+      item.status = newStatus;
+      saveState();
+
+      try {
+        await fetch(`/api/proposal-status/${propId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({
+            status: newStatus,
+            adminPin: 'XORAZMIY_780'
+          })
+        });
+      } catch (err) {}
+      updateMetrics();
+      renderFeed();
+    };
+
+    window.handleDeleteProposal = async function(propId) {
+      if (!confirm("Ushbu taklifni butunlay o'chirmoqchimisiz?")) return;
+
+      try {
+        await fetch(`/api/proposal-delete/${propId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify({ adminPin: 'XORAZMIY_780' })
+        });
+      } catch (e) {}
+
+      proposals = proposals.filter(p => p.id !== propId);
+      saveState();
+    };
+    window.toggleVote = async function(id) {
+      const item = proposals.find(p => p.id === id);
+      if (!item) return;
+
+      const previouslyVoted = !!userVoted[id];
+
+      // Optimistic UI update
+      if (previouslyVoted) {
+        delete userVoted[id];
+        item.votes = Math.max(0, item.votes - 1);
+      } else {
+        userVoted[id] = true;
+        item.votes++;
+        if (item.votes >= 50 && item.status === 'voting') {
+          item.status = 'council';
+        }
+      }
+      saveState();
+
+      // If backend is active, send to SQLite API
+      try {
+        const res = await fetch(`/api/vote/${id}`, {
+          method: 'POST',
+          headers: { 'X-User-Id': userId }
+        });
+        if (res.ok) {
+          const resData = await res.json();
+          item.votes = resData.votes;
+          if (resData.voted) {
+            userVoted[id] = true;
+          } else {
+            delete userVoted[id];
+          }
+          saveState();
+        }
+      } catch (e) {
+        // fallback kept in localStorage
+      }
+    };
+
+    // --- METRICS UPDATE ---
+    function updateMetrics() {
+      const total = proposals.length;
+      const activeCouncil = proposals.filter(p => p.votes >= 50 && p.status !== 'resolved').length;
+      const resolved = proposals.filter(p => p.status === 'resolved').length;
+      const totalVotes = proposals.reduce((acc, p) => acc + p.votes, 0);
+
+      document.getElementById('stat-total').innerText = total + " ta";
+      document.getElementById('stat-active').innerText = activeCouncil + " ta";
+      document.getElementById('stat-resolved').innerText = resolved + " ta";
+      document.getElementById('stat-votes').innerText = totalVotes + "+";
+    }
+
+    // --- FILTER TAB CLICKS ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderFeed();
+      });
+    });
+
+    document.getElementById('category-filter').addEventListener('change', (e) => {
+      currentCategory = e.target.value;
+      renderFeed();
+    });
+
+    // --- NEW PROPOSAL MODAL LOGIC (With Server Backend Sync) ---
+    const newModal = document.getElementById('modal-new-proposal');
+    document.getElementById('btn-open-new-modal').addEventListener('click', () => {
+      newModal.classList.add('active');
+    });
+    document.getElementById('btn-close-new-modal').addEventListener('click', () => {
+      newModal.classList.remove('active');
+    });
+
+    document.getElementById('new-proposal-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('new-title').value.trim();
+      const desc = document.getElementById('new-desc').value.trim();
+      const cat = document.getElementById('new-cat').value;
+      const catSelect = document.getElementById('new-cat');
+      const catText = catSelect.options[catSelect.selectedIndex].text;
+
+      if (!title || !desc) return;
+
+      const payload = {
+        title: title,
+        desc: desc,
+        category: cat,
+        categoryName: catText
+      };
+
+      // Try sending to SQLite backend
+      try {
+        const res = await fetch('/api/proposals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const resData = await res.json();
+          document.getElementById('new-proposal-form').reset();
+          newModal.classList.remove('active');
+          await syncWithServer();
+          return;
+        } else {
+          const errData = await res.json();
+          alert(errData.error || "Xatolik yuz berdi");
+          return;
+        }
+      } catch (err) {
+        // Server offline fallback
+      }
+
+      // Offline LocalStorage fallback
+      const newId = 'prop-' + Date.now();
+      proposals.unshift({
+        id: newId,
+        title: title,
+        desc: desc,
+        category: cat,
+        categoryName: catText,
+        votes: 1,
+        status: 'voting',
+        date: 'Hozirgina',
+        author: 'Anonim O\'quvchi'
+      });
+      userVoted[newId] = true;
+
+      saveState();
+      document.getElementById('new-proposal-form').reset();
+      newModal.classList.remove('active');
+    });
+
+    // --- DIRECTOR REPORT MODAL ---
+    const reportModal = document.getElementById('modal-director-report');
+    document.getElementById('btn-open-report').addEventListener('click', () => {
+      const tbody = document.getElementById('director-table-body');
+      tbody.innerHTML = '';
+
+      const qualified = proposals.filter(p => p.votes >= 50);
+      if (qualified.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Hozircha 50+ ovoz to'plagan takliflar yo'q.</td></tr>`;
+      } else {
+        qualified.forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong style="color:#60a5fa;">${p.categoryName}</strong></td>
+            <td><strong>${p.title}</strong><br/><span style="font-size:12px; color:#cbd5e1;">${p.desc.substring(0, 90)}...</span></td>
+            <td><span style="font-family:'JetBrains Mono'; font-weight:700; color:#fbbf24;">${p.votes} ovoz</span></td>
+            <td><span style="color:#34d399;">${p.status === 'resolved' ? 'Hal etilgan' : 'Ko\'rib chiqishda'}</span></td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+      reportModal.classList.add('active');
+    });
+
+    document.getElementById('btn-close-report-modal').addEventListener('click', () => {
+      reportModal.classList.remove('active');
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('active');
+      }
+    });
+
+    // Start by syncing with server and updating UI
+    updateAdminButtonUI();
+    syncWithServer();
+  </script>
+</body>
+</html>
