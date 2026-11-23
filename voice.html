@@ -1712,7 +1712,12 @@
       }
     ];
 
-    let proposals = JSON.parse(localStorage.getItem('akss_proposals')) || DEFAULT_PROPOSALS;
+    let storedProps = null;
+    try {
+      const raw = localStorage.getItem('akss_proposals');
+      if (raw !== null) storedProps = JSON.parse(raw);
+    } catch (e) {}
+    let proposals = Array.isArray(storedProps) ? storedProps : [];
     let userVoted = JSON.parse(localStorage.getItem('akss_user_voted')) || {};
     let backendOnline = false;
 
@@ -1822,15 +1827,13 @@
 
     let storedPolls = null;
     try {
-      storedPolls = JSON.parse(localStorage.getItem('akss_polls'));
+      const rawPolls = localStorage.getItem('akss_polls');
+      if (rawPolls !== null) {
+        storedPolls = JSON.parse(rawPolls);
+      }
     } catch (e) {}
 
-    if (!storedPolls || !Array.isArray(storedPolls) || storedPolls.length < 5) {
-      storedPolls = DEFAULT_POLLS;
-      localStorage.setItem('akss_polls', JSON.stringify(DEFAULT_POLLS));
-    }
-
-    let polls = storedPolls;
+    let polls = Array.isArray(storedPolls) ? storedPolls : [];
     let userPollChoices = JSON.parse(localStorage.getItem('akss_poll_choices')) || {};
     let currentPollMinistry = 'all';
 
@@ -1842,8 +1845,9 @@
         });
         if (res.ok) {
           const data = await res.json();
-          if (data.proposals) {
+          if (Array.isArray(data.proposals)) {
             proposals = data.proposals;
+            localStorage.setItem('akss_proposals', JSON.stringify(proposals));
             backendOnline = true;
           }
         }
@@ -1858,6 +1862,7 @@
           (votesData.voted_ids || []).forEach(id => {
             userVoted[id] = true;
           });
+          localStorage.setItem('akss_user_voted', JSON.stringify(userVoted));
         }
 
         // Fetch polls from SQLite
@@ -1866,13 +1871,15 @@
         });
         if (pollsRes.ok) {
           const pollsData = await pollsRes.json();
-          if (pollsData.polls) {
+          if (Array.isArray(pollsData.polls)) {
             polls = pollsData.polls;
+            localStorage.setItem('akss_polls', JSON.stringify(polls));
             polls.forEach(p => {
               if (p.myChoice !== null && p.myChoice !== undefined) {
                 userPollChoices[p.id] = p.myChoice;
               }
             });
+            localStorage.setItem('akss_poll_choices', JSON.stringify(userPollChoices));
           }
         }
       } catch (err) {

@@ -56,137 +56,18 @@ def init_db():
             PRIMARY KEY (poll_id, user_hash)
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS app_metadata (
+            key TEXT PRIMARY KEY,
+            val TEXT
+        )
+    ''')
     
-    # Check if empty, populate with realistic AKSS Andijan initial seeds
-    c.execute('SELECT COUNT(*) FROM proposals')
-    if c.fetchone()[0] == 0:
-        initial_seeds = [
-            (
-                'prop-1',
-                "3-qavat IT Lab 2 dagi Wi-Fi router tezligini oshirish va qayta sozlash",
-                "Dasturlash darslarida (C++ va Python paketlarini yuklashda) internet tezligi tushib ketmoqda. Har bir darsda 30 ta o'quvchi bir vaqtda ulanganda router qizib o'chib qolmoqda. Bitta qo'shimcha Gigabit switch yoki 5GHz access point o'rnatish taklif etiladi.",
-                'it', 'Wi-Fi & IT Uskunalar', 'Anonim O\'quvchi (10-sinf)',
-                time.time() - 86400 * 3, 'council', 78
-            ),
-            (
-                'prop-2',
-                "Oshxonadagi navbatni kamaytirish uchun tanaffusdan 15 daqiqa oldin Telegram orqali buyurtma berish",
-                "Katta tanaffusda 15 daqiqa davomida kassada uzun navbat hosil bo'lmoqda. Ko'pchilik ovqat yeb ulgurmay qolyapti. Oshxona uchun oddiy menyu-bot yaratib, o'quvchilar oldindan band qilib qo'yadigan tizim kiritilsa yaxshi bo'lardi.",
-                'oshxona', 'Oshxona & Taomlar', 'Anonim O\'quvchi (9-sinf)',
-                time.time() - 86400 * 5, 'council', 64
-            ),
-            (
-                'prop-3',
-                "Kutubxonaga xalqaro SAT Math va yangi C++ / Algoritmlar kitoblarini qo'shish",
-                "Kutubxonamizda badiiy kitoblar ko'p, lekin New Uzbekistan va xorijiy universitetlarga tayyorlanish uchun yangi 2024–2025 Digital SAT qo'llanmalari va IOI algoritmlari bo'yicha kitoblar yetishmayapti.",
-                'kutubxona', 'Kutubxona & SAT/IELTS', 'Anonim O\'quvchi (11-sinf)',
-                time.time() - 86400, 'voting', 48
-            ),
-            (
-                'prop-4',
-                "Sport zalidagi stol tennisi raketkalari va to'rlarini yangilash",
-                "Darsdan keyingi tanaffusda o'quvchilar stol tennisi o'ynashni xohlashadi, ammo mavjud 4 ta raketkaning rezinkalari ko'chib ketgan. Student Council hisobidan yangi 4 juft sifatli raketka olib berilishi so'raladi.",
-                'sport', 'Sport & Salomatlik', 'Anonim O\'quvchi (8-sinf)',
-                time.time() - 86400 * 14, 'resolved', 82
-            ),
-            (
-                'prop-5',
-                "2-qavatdagi sinfxonalar proyektorlariga HDMI kabellari va pultlarini sozlash",
-                "Prezentatsiya darslarida o'qituvchilar doim HDMI kabel qidirib vaqt yo'qotmoqda. Har bir sinf xonasiga bittadan qattiq mahkamlangan kabel va pult qo'yilsa darslar tezroq boshlanardi.",
-                'sharoit', 'Sinfxonalar & Sharoit', 'Anonim O\'quvchi (7-sinf)',
-                time.time() - 12000, 'voting', 38
-            )
-        ]
-        c.executemany('''
-            INSERT INTO proposals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', initial_seeds)
-
-    # Populate initial realistic polls for all 6 Ministries if empty
-    c.execute('SELECT COUNT(*) FROM polls')
-    if c.fetchone()[0] == 0:
-        initial_polls = [
-            (
-                'poll-1',
-                "Xalqaro olimpiada va SAT tayyorgarligi uchun haftaning qaysi kunida qo'shimcha master-klass o'tkazilsin?",
-                "Ta'lim va ilm-fan vazirligi",
-                "Ta'lim va ilm-fan vazirligi",
-                json.dumps([
-                    {"text": "Shanba kuni darsdan so'ng (14:00 - 16:00)", "votes": 78},
-                    {"text": "Chorshanba kuni katta tanaffusda", "votes": 34},
-                    {"text": "Yakshanba kuni onlayn (Zoom orqali)", "votes": 52}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 1,
-                "active"
-            ),
-            (
-                'poll-2',
-                "Navro'z va Bahor umummaktab bayramida qaysi ijodiy tanlov asosiy bo'lsin?",
-                "Madaniyat va san'at vazirligi",
-                "Madaniyat va san'at vazirligi",
-                json.dumps([
-                    {"text": "Milliy taomlar va urf-odatlar ko'rgazmasi", "votes": 115},
-                    {"text": "Mini QVZ va qiziqarli sahna ko'rinishlari", "votes": 98},
-                    {"text": "Jonli vokal va milliy cholg'ular ijrosi", "votes": 46}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 2,
-                "active"
-            ),
-            (
-                'poll-3',
-                "Keyingi oylik maktab Hackathon musobaqasi qaysi yo'nalishda bo'lsin?",
-                "IT va media vazirligi",
-                "IT va media vazirligi",
-                json.dumps([
-                    {"text": "Sun'iy Intellekt va AI Agentlar (LLM)", "votes": 128},
-                    {"text": "Telegram Botlar & WebApp (TWA)", "votes": 84},
-                    {"text": "Kiberxavfsizlik & CTF (Ethical Hacking)", "votes": 61}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 3,
-                "active"
-            ),
-            (
-                'poll-4',
-                "Bahorgi sinflararo maktab chempionati qaysi sport turi bo'yicha o'tkazilsin?",
-                "Sport vazirligi",
-                "Sport vazirligi",
-                json.dumps([
-                    {"text": "Mini-futbol (Chempionlar ligasi kubogi)", "votes": 152},
-                    {"text": "Stol tennisi (Yakkalik va juftlik)", "votes": 64},
-                    {"text": "Shaxmat va shashka intellektual turniri", "votes": 49}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 4,
-                "active"
-            ),
-            (
-                'poll-5',
-                "Maktab hududida 'Yashil Makon' loyihasi bo'yicha qaysi tashabbusni boshlaymiz?",
-                "Ekologiya vazirligi",
-                "Ekologiya vazirligi",
-                json.dumps([
-                    {"text": "Sinfxonalarga batareyka va plastiklarni saralash qutilari", "votes": 104},
-                    {"text": "Maktab bog'iga yangi mevali daraxtlar va atirgullar ekish", "votes": 89},
-                    {"text": "Qog'oz chiqindilarini yig'ish (Makulatura haftaligi)", "votes": 47}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 5,
-                "active"
-            ),
-            (
-                'poll-6',
-                "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
-                "Maktab ma'muriyati",
-                "Maktab ma'muriyati",
-                json.dumps([
-                    {"text": "Ha, to'liq qo'llab-quvvatlayman (Hudi / Jinsi)", "votes": 168},
-                    {"text": "Faqat to'q rangli erkin kiyim ruxsat etilsin", "votes": 38},
-                    {"text": "Klassik maktab formasi qolgani ma'qul", "votes": 16}
-                ], ensure_ascii=False),
-                time.time() - 86400 * 7,
-                "active"
-            )
-        ]
-        c.executemany('''
-            INSERT INTO polls VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', initial_polls)
+    # Mark database initialized. Never auto-reseed if tables are emptied by user!
+    c.execute('SELECT val FROM app_metadata WHERE key = ?', ('seeded',))
+    row = c.fetchone()
+    if not row:
+        c.execute('INSERT OR REPLACE INTO app_metadata (key, val) VALUES (?, ?)', ('seeded', '1'))
     conn.commit()
     conn.close()
 
@@ -558,6 +439,25 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
             conn.close()
 
             self.send_json({'success': True, 'deletedId': prop_id})
+            return
+
+        elif path == '/api/admin/reset-database':
+            admin_pin = body.get('adminPin', '').strip()
+            if admin_pin != ADMIN_SECRET_KEY:
+                self.send_json({'error': 'Xato Maxfiy Kod!'}, 403)
+                return
+
+            conn = sqlite3.connect(DB_FILE)
+            c = conn.cursor()
+            c.execute('DELETE FROM proposals')
+            c.execute('DELETE FROM votes')
+            c.execute('DELETE FROM polls')
+            c.execute('DELETE FROM poll_votes')
+            c.execute('INSERT OR REPLACE INTO app_metadata (key, val) VALUES (?, ?)', ('seeded', '1'))
+            conn.commit()
+            conn.close()
+
+            self.send_json({'success': True, 'message': 'Barcha ma\'lumotlar tozalandi (0 ta)'})
             return
 
         self.send_json({'error': 'API topilmadi'}, 404)
