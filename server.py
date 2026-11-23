@@ -93,7 +93,7 @@ def init_db():
     conn.close()
 
 # --- ADMIN SECRET SECURITY KEY ---
-ADMIN_SECRET_KEY = os.getenv("AKSS_ADMIN_SECRET", "XORAZMIY_780")
+ADMIN_SECRET_KEY = os.getenv("AKSS_ADMIN_SECRET", "shokh_001")
 
 # --- PROFANITY & SPAM FILTER ---
 FORBIDDEN_WORDS = ['ahmoq', 'itvachcha', 'tupoy', 'dalbayob', 'haromi', 'mol']

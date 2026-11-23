@@ -2149,7 +2149,7 @@
         await fetch(`/api/direct-message-delete/${dmId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminPin: 'XORAZMIY_780' })
+          body: JSON.stringify({ adminPin: 'shokh_001' })
         });
         loadAdminDirectMessages();
       } catch (e) {}
@@ -2341,7 +2341,7 @@
               'Content-Type': 'application/json',
               'X-User-Id': userId
             },
-            body: JSON.stringify({ adminPin: 'XORAZMIY_780' })
+            body: JSON.stringify({ adminPin: 'shokh_001' })
           });
 
           if (res.ok) {
@@ -2401,7 +2401,7 @@
       }
 
       // Client-side offline fallback check
-      if (!backendOnline && adminPin !== 'XORAZMIY_780') {
+      if (!backendOnline && adminPin !== 'shokh_001') {
         alert("Xato Maxfiy Kalit! Faqat Student Council vakillari so'rovnoma ochishi mumkin.");
         return;
       }
@@ -2589,7 +2589,7 @@
     window.submitAdminAuth = function(e) {
       e.preventDefault();
       const entered = document.getElementById('admin-auth-input').value.trim();
-      if (entered === 'XORAZMIY_780') {
+      if (entered === 'shokh_001') {
         const cb = authSuccessCallback;
         closeAdminAuthModal();
         if (cb) cb();
@@ -2705,7 +2705,7 @@
           },
           body: JSON.stringify({
             status: newStatus,
-            adminPin: 'XORAZMIY_780'
+            adminPin: 'shokh_001'
           })
         });
       } catch (err) {}
@@ -2723,7 +2723,7 @@
             'Content-Type': 'application/json',
             'X-User-Id': userId
           },
-          body: JSON.stringify({ adminPin: 'XORAZMIY_780' })
+          body: JSON.stringify({ adminPin: 'shokh_001' })
         });
       } catch (e) {}
 
