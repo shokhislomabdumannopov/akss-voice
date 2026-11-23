@@ -271,12 +271,13 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
             new_id = f"prop-{int(time.time() * 1000)}"
             user_id = self.headers.get('X-User-Id', f"anon-{time.time()}")
             user_hash = hashlib.sha256(user_id.encode('utf-8')).hexdigest()
+            author = body.get('author', 'Anonim O\'quvchi').strip() or 'Anonim O\'quvchi'
 
             conn = sqlite3.connect(DB_FILE)
             c = conn.cursor()
             c.execute('''
                 INSERT INTO proposals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (new_id, title, desc, category, category_name, "Anonim O'quvchi", time.time(), 'voting', 1))
+            ''', (new_id, title, desc, category, category_name, author, time.time(), 'voting', 1))
             c.execute('''
                 INSERT INTO votes VALUES (?, ?, ?)
             ''', (new_id, user_hash, time.time()))
@@ -540,13 +541,13 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
             if admin_chat_id:
                 formatted_time = datetime.fromtimestamp(now_ts).strftime('%Y-%m-%d %H:%M')
                 tg_text = (
-                    "📬 <b>YANGI ERKIN MUROJAAT (AKSS Voice)</b>\n\n"
+                    "📬 <b>YANGI ERKIN MUROJAAT (AK SS Voice)</b>\n\n"
                     f"📌 <b>Mavzu:</b> {html.escape(subject)}\n"
                     f"👤 <b>Yuboruvchi:</b> {html.escape(sender)}\n"
                     f"🕒 <b>Vaqt:</b> {formatted_time}\n\n"
                     f"📝 <b>Xabar matni:</b>\n"
                     f"{html.escape(message_text)}\n\n"
-                    f"🌐 <a href=\"{WEB_APP_URL}\">AKSS Voice Portaliga o'tish</a>"
+                    f"🌐 <a href=\"{WEB_APP_URL}\">AK SS Voice Portaliga o'tish</a>"
                 )
                 res = tg_api_call("sendMessage", {
                     "chat_id": int(admin_chat_id),
@@ -636,11 +637,11 @@ def get_live_stats_text():
         top_votes = top[1] if top else 0
 
         return (
-            "📊 <b>AKSS Voice — Jonli Maktab Statistikasi:</b>\n\n"
+            "📊 <b>AK SS Voice — Jonli Maktab Statistikasi:</b>\n\n"
             f"💡 Jami anonim takliflar: <b>{total_props} ta</b>\n"
             f"🔥 Direktor stolida (50+ ovoz): <b>{council} ta</b>\n"
             f"🟢 Hal etilgan / Bajarilgan: <b>{resolved} ta</b>\n"
-            f"🗳 O'quvchilar bergan ovozlari: <b>{votes} ta</b>\n\n"
+            f"🗳 O'quvchilar va O'qituvchilar ovozlari: <b>{votes} ta</b>\n\n"
             f"🏆 <b>Eng faol taklif:</b>\n"
             f"«<i>{top_title}</i>» (<b>{top_votes} ta ovoz</b>)\n\n"
             "O'z taklifingizni kiritish uchun quyidagi tugmani bosing!"
@@ -651,20 +652,20 @@ def get_live_stats_text():
 def tg_send_welcome(chat_id, first_name):
     welcome_text = (
         f"Assalomu alaykum, <b>{first_name}</b>! 👋\n\n"
-        "🏛 <b>AKSS Voice — Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktabi</b>\n"
-        "<b>Student Council (O'quvchilar Kengashi)</b> rasmiy anonim takliflar va muammolar platformasiga xush kelibsiz!\n\n"
-        "📌 <b>Platformada siz:</b>\n"
-        "• Maktabdagi har qanday kamchilik (Wi-Fi, oshxona, sharoit) bo'yicha <b>100% anonim</b> taklif qoldirishingiz;\n"
-        "• Boshqa o'quvchilar takliflariga ovoz berishingiz;\n"
-        "• Kengash e'lon qilgan 6 ta vazirlik so'rovnomalarida qatnashishingiz mumkin.\n\n"
-        "⚡ <b>50 ta ovoz yig'ilgan har bir masala</b> dushanba kuni Student Council orqali "
+        "🏛 <b>AK SS Voice — Muhammad al-Xorazmiy nomidagi ixtisoslashtirilgan maktabi</b>\n"
+        "<b>O'quvchilar va O'qituvchilar Kengashi (Student & Teacher Council)</b> rasmiy platformasiga xush kelibsiz!\n\n"
+        "📌 <b>Platformada o'quvchilar va o'qituvchilar:</b>\n"
+        "• Maktabdagi har qanday kamchilik (Wi-Fi, dars xonalari, oshxona, sharoit) bo'yicha <b>100% anonim</b> taklif qoldirishi;\n"
+        "• Boshqa takliflarga erkin ovoz berishi;\n"
+        "• 6 ta yo'nalishdagi rasmiy so'rovnomalarda qatnashishi mumkin.\n\n"
+        "⚡ <b>50 ta ovoz yig'ilgan har bir masala</b> dushanba kuni Kengash orqali "
         "<b>to'g'ridan-to'g'ri maktab direktoriga</b> taqdim etiladi.\n\n"
         "Quyidagi tugmani bosing va platformani oching 👇"
     )
 
     inline_kb = {
         "inline_keyboard": [
-            [{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}],
+            [{"text": "🚀 AK SS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}],
             [{"text": "📊 Jonli Statistika", "callback_data": "btn_stats"}, {"text": "ℹ️ Qoidalar", "callback_data": "btn_rules"}]
         ]
     }
@@ -687,7 +688,7 @@ def run_telegram_bot_daemon():
         tg_api_call("setChatMenuButton", {
             "menu_button": {
                 "type": "web_app",
-                "text": "📢 AKSS Voice",
+                "text": "📢 AK SS Voice",
                 "web_app": {"url": WEB_APP_URL}
             }
         })
@@ -735,7 +736,7 @@ def run_telegram_bot_daemon():
                                     tg_api_call("sendMessage", {
                                         "chat_id": chat_id,
                                         "text": (
-                                            "📬 <b>YANGI ERKIN MUROJAAT (AKSS Voice)</b>\n\n"
+                                            "📬 <b>YANGI ERKIN MUROJAAT (AK SS Voice)</b>\n\n"
                                             f"📌 <b>Mavzu:</b> {html.escape(p_subj)}\n"
                                             f"👤 <b>Yuboruvchi:</b> {html.escape(p_snd)}\n"
                                             f"🕒 <b>Vaqt:</b> {p_time}\n\n"
@@ -758,14 +759,14 @@ def run_telegram_bot_daemon():
                                     "chat_id": chat_id,
                                     "text": (
                                         f"👑 Assalomu alaykum, <b>{first_name} (@shoxislom)</b>!\n\n"
-                                        "✅ <b>Siz AKSS Voice boshqaruvchisi sifatida botga muvaffaqiyatli bog'landingiz!</b>\n"
+                                        "✅ <b>Siz AK SS Voice boshqaruvchisi sifatida botga muvaffaqiyatli bog'landingiz!</b>\n"
                                         f"🆔 Sizning Telegram Chat ID: <code>{chat_id}</code>\n\n"
-                                        "📬 O'quvchilar AKSS Voice portalidagi <b>«Erkin Murojaat»</b> bo'limidan "
+                                        "📬 O'quvchilar va O'qituvchilar AK SS Voice portalidagi <b>«Erkin Murojaat»</b> bo'limidan "
                                         "yozgan har bir xabar (Mavzu va Matn) <b>to'g'ridan-to'g'ri shu yerga</b> yetib keladi!"
                                     ),
                                     "parse_mode": "HTML",
                                     "reply_markup": {
-                                        "inline_keyboard": [[{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                        "inline_keyboard": [[{"text": "🚀 AK SS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
                                     }
                                 })
                             else:
@@ -850,7 +851,7 @@ def run_telegram_bot_daemon():
                         elif text.startswith("/portal") or "portal" in text.lower():
                             tg_api_call("sendMessage", {
                                 "chat_id": chat_id,
-                                "text": "🚀 <b>AKSS Voice Portalini ochish uchun quyidagi tugmani bosing:</b>",
+                                "text": "🚀 <b>AK SS Voice Portalini ochish uchun quyidagi tugmani bosing:</b>",
                                 "parse_mode": "HTML",
                                 "reply_markup": {
                                     "inline_keyboard": [[{"text": "🚀 Portalni Ochish", "web_app": {"url": WEB_APP_URL}}]]
@@ -869,10 +870,11 @@ def run_telegram_bot_daemon():
                             tg_api_call("sendMessage", {
                                 "chat_id": chat_id,
                                 "text": (
-                                    "ℹ️ <b>AKSS Voice Platformasi Qoidalari:</b>\n\n"
-                                    "1. <b>100% Anonimlik:</b> Ism-familiyangiz hech kimga ko'rinmaydi.\n"
-                                    "2. <b>50 ta Ovoz:</b> 50 ta haqiqiy ovoz to'plagan har bir masala dushanba kuni direktor stoliga kiritiladi.\n"
-                                    "3. <b>6 ta Vazirlik:</b> Student Council so'rovnomalari 6 ta vazirlik yo'nalishida o'tkaziladi."
+                                    "ℹ️ <b>AK SS Voice Platformasi Qoidalari:</b>\n\n"
+                                    "1. <b>100% Anonimlik:</b> Ism-familiyangiz va shaxsingiz hech kimga oshkor qilinmaydi.\n"
+                                    "2. <b>O'quvchi va O'qituvchilar:</b> Butun maktab jamoasi (o'quvchi va ustozlar) o'z taklif va muammolarini bildira oladi.\n"
+                                    "3. <b>50 ta Ovoz:</b> 50 ta haqiqiy ovoz to'plagan har bir masala dushanba kuni direktor stoliga kiritiladi.\n"
+                                    "4. <b>6 ta Vazirlik:</b> Kengash so'rovnomalari 6 ta yo'nalishda o'tkaziladi."
                                 ),
                                 "parse_mode": "HTML",
                                 "reply_markup": {
@@ -885,7 +887,7 @@ def run_telegram_bot_daemon():
                                 "text": f"Assalomu alaykum, <b>{first_name}</b>!\nPortalni ochish uchun quyidagi tugmani bosing 👇",
                                 "parse_mode": "HTML",
                                 "reply_markup": {
-                                    "inline_keyboard": [[{"text": "🚀 AKSS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
+                                    "inline_keyboard": [[{"text": "🚀 AK SS Voice Portalini Ochish", "web_app": {"url": WEB_APP_URL}}]]
                                 }
                             })
 
@@ -928,7 +930,7 @@ def run_server(port=None):
     server_address = ('', port)
     httpd = HTTPServer(server_address, VoiceAPIHandler)
     print("=" * 60)
-    print(f"🚀 AKSS Voice Haqiqiy Backend Serveri ishga tushdi! (Port: {port})")
+    print(f"🚀 AK SS Voice Haqiqiy Backend Serveri ishga tushdi! (Port: {port})")
     print(f"📍 Manzil: http://localhost:{port}/voice.html")
     print(f"💾 SQLite Ma'lumotlar bazasi: {DB_FILE}")
     print("=" * 60)
