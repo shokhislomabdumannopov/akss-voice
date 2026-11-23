@@ -1,0 +1,5 @@
+# AKSS Voice requires only Python 3.8+ standard libraries!
+# No mandatory pip packages are needed for server.py.
+# If you want to use advanced asynchronous Telegram bot frameworks:
+# aiogram>=3.0.0
+# uvicorn>=0.23.0
