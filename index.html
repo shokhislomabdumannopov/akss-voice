@@ -2,7 +2,10 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>AKSS Voice — Anonim Takliflar va Muammolar Radari</title>
 
   <!-- Google Fonts & Font Awesome Icons -->
@@ -453,6 +456,84 @@
       padding: 2px 7px;
       border-radius: 10px;
       font-weight: 800;
+      transition: all 0.2s ease;
+    }
+
+    /* 6 ta Vazirlik (Kategoriyalar) Paneli */
+    .ministry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .ministry-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+      position: relative;
+      text-align: left;
+    }
+
+    .ministry-card:hover {
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .ministry-card.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.15);
+      box-shadow: 0 0 0 1px #3b82f6, 0 8px 24px rgba(59, 130, 246, 0.25);
+    }
+
+    .ministry-card .m-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .ministry-card.active .m-icon {
+      transform: scale(1.08);
+    }
+
+    .ministry-card .m-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ministry-card .m-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .ministry-card .m-count {
+      font-size: 11.5px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .ministry-card.active .m-count {
+      color: #93c5fd;
     }
 
     /* Poll Cards Styling */
@@ -984,27 +1065,148 @@
     }
 
     /* Responsive */
+    .btn-text-short { display: none; }
+
     @media (max-width: 768px) {
+      .btn-text-full { display: none; }
+      .btn-text-short { display: inline; }
+
+      header {
+        padding: 12px 14px;
+      }
       .header-inner {
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
         align-items: stretch;
       }
-      .header-actions {
-        justify-content: space-between;
+      .brand-wrap {
+        gap: 10px;
       }
+      .brand-title h1 {
+        font-size: 19px;
+      }
+      .brand-title p {
+        font-size: 11px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .header-actions {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+      }
+      .btn-admin-auth, .btn-council-report, .btn-new-proposal {
+        flex: 1;
+        padding: 9px 6px;
+        font-size: 11.5px;
+        justify-content: center;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      main {
+        padding: 14px 10px 40px;
+      }
+      .hero-banner {
+        padding: 16px 14px;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .hero-text h2 {
+        font-size: 15px;
+      }
+      .hero-text p {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .metric-card {
+        padding: 12px 10px;
+        gap: 10px;
+      }
+      .metric-card .icon-wrap {
+        width: 36px;
+        height: 36px;
+        font-size: 15px;
+      }
+      .metric-card .num {
+        font-size: 20px;
+      }
+      .metric-card .label {
+        font-size: 11px;
+      }
+
+      .feed-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .filter-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .filter-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+      .category-select-wrap select {
+        width: 100%;
+      }
+
       .proposal-card {
         flex-direction: column;
         gap: 14px;
+        padding: 16px 14px;
       }
       .vote-box {
         flex-direction: row;
         width: 100%;
         height: 44px;
         gap: 12px;
+        justify-content: center;
       }
       .vote-count {
         margin-top: 0;
+      }
+
+      .ministry-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .ministry-card {
+        padding: 10px 10px;
+        gap: 8px;
+        border-radius: 12px;
+      }
+      .ministry-card .m-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+        border-radius: 9px;
+      }
+      .ministry-card .m-name {
+        font-size: 11.5px;
+        line-height: 1.25;
+      }
+      .ministry-card .m-count {
+        font-size: 10px;
+      }
+
+      .modal-box {
+        max-width: 94% !important;
+        padding: 20px 16px !important;
+        margin: 10px;
       }
     }
   </style>
@@ -1027,15 +1229,17 @@
       <div class="header-actions">
         <button class="btn-admin-auth" id="btn-admin-mode" onclick="toggleAdminMode()" title="Maktab ma'muriyati yoki Student Council uchun">
           <i class="fa-solid fa-lock"></i>
-          <span id="admin-mode-text">Admin Kirish</span>
+          <span id="admin-mode-text">Admin</span>
         </button>
         <button class="btn-council-report" id="btn-open-report">
           <i class="fa-solid fa-clipboard-list"></i>
-          <span>Dushanba Hisoboti (Direktorga)</span>
+          <span class="btn-text-full">Dushanba Hisoboti (Direktorga)</span>
+          <span class="btn-text-short">Hisobot</span>
         </button>
         <button class="btn-new-proposal" id="btn-open-new-modal">
           <i class="fa-solid fa-plus"></i>
-          <span>Anonim Taklif Yozish</span>
+          <span class="btn-text-full">Anonim Taklif Yozish</span>
+          <span class="btn-text-short">Taklif</span>
         </button>
       </div>
     </div>
@@ -1108,12 +1312,12 @@
         <button class="section-btn active" id="sec-btn-proposals" onclick="switchSection('proposals')">
           <i class="fa-solid fa-bullhorn"></i>
           <span>Takliflar & Muammolar</span>
-          <span class="badge-counter" id="badge-proposals-count">14</span>
+          <span class="badge-counter" id="badge-proposals-count">0</span>
         </button>
         <button class="section-btn" id="sec-btn-polls" onclick="switchSection('polls')">
           <i class="fa-solid fa-square-poll-vertical"></i>
           <span>Maktab So'rovnomalari (Polls)</span>
-          <span class="badge-counter" id="badge-polls-count" style="background: rgba(16, 185, 129, 0.3); color: #34d399;">3 ta faol</span>
+          <span class="badge-counter" id="badge-polls-count" style="background: rgba(16, 185, 129, 0.3); color: #34d399;">0 ta faol</span>
         </button>
       </div>
     </div>
@@ -1157,8 +1361,8 @@
     <div id="section-polls" style="display: none;">
       <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #fff;"><i class="fa-solid fa-chart-pie" style="color: #60a5fa; margin-right: 8px;"></i> Rasmiy Maktab So'rovnomalari</h3>
-          <p style="font-size: 12.5px; color: #94a3b8; margin-top: 3px;">Ma'muriyat va Student Council tomonidan o'quvchilar fikrini o'rganish uchun e'lon qilingan so'rovnomalar.</p>
+          <h3 style="font-size: 16px; font-weight: 700; color: #fff;"><i class="fa-solid fa-chart-pie" style="color: #60a5fa; margin-right: 8px;"></i> Rasmiy Maktab So'rovnomalari (Vazirliklar kesimida)</h3>
+          <p style="font-size: 12.5px; color: #94a3b8; margin-top: 3px;">Student Council vazirliklari va Maktab Ma'muriyati tomonidan o'quvchilar fikrini o'rganish bo'limi.</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
           <button onclick="openNewPollModal()" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 9px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
@@ -1166,6 +1370,11 @@
             <span>+ Yangi So'rovnoma (Admin)</span>
           </button>
         </div>
+      </div>
+
+      <!-- 6 TA VAZIRLIK (KATEGORIYALAR) KARTALARI -->
+      <div class="ministry-grid" id="ministry-filter-cards">
+        <!-- Filled dynamically by JS -->
       </div>
 
       <div class="polls-grid" id="polls-feed">
@@ -1273,22 +1482,24 @@
         <div class="form-group">
           <label>Tashkilotchi (Kim nomidan e'lon qilinmoqda?):</label>
           <select class="form-select" id="poll-organizer" required>
-            <option value="Student Council & Ma'muriyat">Student Council & Ma'muriyat</option>
-            <option value="Maktab Ma'muriyati">Maktab Ma'muriyati</option>
-            <option value="AKSS IT Qo'mitasi">AKSS IT Qo'mitasi</option>
-            <option value="Oshxona Komissiyasi">Oshxona Komissiyasi</option>
-            <option value="Kutubxona & Ilmiy Kengash">Kutubxona & Ilmiy Kengash</option>
+            <option value="Ta'lim va ilm-fan vazirligi">📚 Ta'lim va ilm-fan vazirligi</option>
+            <option value="Madaniyat va san'at vazirligi">🎭 Madaniyat va san'at vazirligi</option>
+            <option value="IT va media vazirligi">💻 IT va media vazirligi</option>
+            <option value="Sport vazirligi">⚽ Sport vazirligi</option>
+            <option value="Ekologiya vazirligi">🌱 Ekologiya vazirligi</option>
+            <option value="Maktab ma'muriyati">🏛️ Maktab ma'muriyati</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Yo'nalish (Kategoriya):</label>
+          <label>Yo'nalish (Vazirlik / Kategoriya):</label>
           <select class="form-select" id="poll-category" required>
-            <option value="Maktab Tartibi">Maktab Tartibi & Kiyim</option>
-            <option value="Texnologiya & IT">Texnologiya & Hackathonlar</option>
-            <option value="Oshxona & Taomlar">Oshxona & Taomlar</option>
-            <option value="Dars Jadvali & O'qish">Dars Jadvali & O'qish</option>
-            <option value="Sport & Tadbirlar">Sport & Tadbirlar</option>
+            <option value="Ta'lim va ilm-fan vazirligi">📚 Ta'lim va ilm-fan vazirligi</option>
+            <option value="Madaniyat va san'at vazirligi">🎭 Madaniyat va san'at vazirligi</option>
+            <option value="IT va media vazirligi">💻 IT va media vazirligi</option>
+            <option value="Sport vazirligi">⚽ Sport vazirligi</option>
+            <option value="Ekologiya vazirligi">🌱 Ekologiya vazirligi</option>
+            <option value="Maktab ma'muriyati">🏛️ Maktab ma'muriyati</option>
           </select>
         </div>
 
@@ -1411,14 +1622,27 @@
 
   <!-- JavaScript Application Logic (Connected to Real Backend & Telegram) -->
   <script>
-    // --- USER IDENTITY RESOLUTION (Telegram WebApp or Device UUID) ---
+    // --- TELEGRAM WEBAPP INTEGRATION & USER IDENTITY ---
     let userId = 'anon_guest';
-    const isTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user);
+    const tgApp = window.Telegram?.WebApp;
 
-    if (isTelegram) {
-      userId = 'tg_' + window.Telegram.WebApp.initDataUnsafe.user.id;
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+    if (tgApp) {
+      try {
+        tgApp.ready();
+        tgApp.expand();
+        if (typeof tgApp.setHeaderColor === 'function') tgApp.setHeaderColor('#090d16');
+        if (typeof tgApp.setBackgroundColor === 'function') tgApp.setBackgroundColor('#090d16');
+        if (typeof tgApp.enableClosingConfirmation === 'function') tgApp.enableClosingConfirmation();
+      } catch (err) {
+        console.warn('Telegram WebApp init notice:', err);
+      }
+
+      if (tgApp.initDataUnsafe && tgApp.initDataUnsafe.user && tgApp.initDataUnsafe.user.id) {
+        userId = 'tg_' + tgApp.initDataUnsafe.user.id;
+      } else {
+        userId = localStorage.getItem('akss_device_id') || ('tg_user_' + Math.random().toString(36).substring(2, 9));
+        localStorage.setItem('akss_device_id', userId);
+      }
     } else {
       userId = localStorage.getItem('akss_device_id');
       if (!userId) {
@@ -1490,57 +1714,123 @@
     let userVoted = JSON.parse(localStorage.getItem('akss_user_voted')) || {};
     let backendOnline = false;
 
-    // --- SAMPLE SEED POLLS (Fallback if server offline) ---
+    // --- 6 TA VAZIRLIK (KATEGORIYALAR) VA DEFAULT SO'ROVNOMALAR ---
+    const POLL_MINISTRIES = [
+      { id: 'all', name: "Barcha Yo'nalishlar", icon: "fa-layer-group", color: "#3b82f6" },
+      { id: "Ta'lim va ilm-fan vazirligi", name: "Ta'lim va ilm-fan", icon: "fa-graduation-cap", color: "#60a5fa" },
+      { id: "Madaniyat va san'at vazirligi", name: "Madaniyat va san'at", icon: "fa-masks-theater", color: "#ec4899" },
+      { id: "IT va media vazirligi", name: "IT va media", icon: "fa-laptop-code", color: "#8b5cf6" },
+      { id: "Sport vazirligi", name: "Sport vazirligi", icon: "fa-futbol", color: "#10b981" },
+      { id: "Ekologiya vazirligi", name: "Ekologiya vazirligi", icon: "fa-seedling", color: "#22c55e" },
+      { id: "Maktab ma'muriyati", name: "Maktab ma'muriyati", icon: "fa-landmark", color: "#f59e0b" }
+    ];
+
     const DEFAULT_POLLS = [
       {
-        id: 'poll-1',
-        title: "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
-        organizer: "Student Council & Ma'muriyat",
-        category: "Maktab Tartibi",
+        id: 'poll-talim',
+        title: "Xalqaro olimpiada va SAT tayyorgarligi uchun haftaning qaysi kunida qo'shimcha master-klass o'tkazilsin?",
+        organizer: "Ta'lim va ilm-fan vazirligi",
+        category: "Ta'lim va ilm-fan vazirligi",
         options: [
-          { text: "Ha, to'liq qo'llab-quvvatlayman (Hudi/Jinsi)", votes: 142 },
-          { text: "Faqat to'q rangli erkin kiyim ruxsat etilsin", votes: 35 },
-          { text: "Klassik forma qolgani ma'qul", votes: 14 }
+          { text: "Shanba kuni darsdan so'ng (14:00 - 16:00)", votes: 78 },
+          { text: "Chorshanba kuni katta tanaffusda", votes: 34 },
+          { text: "Yakshanba kuni onlayn (Zoom orqali)", votes: 52 }
         ],
-        totalVotes: 191,
+        totalVotes: 164,
+        myChoice: null,
+        status: "active",
+        date: "Kecha"
+      },
+      {
+        id: 'poll-madaniyat',
+        title: "Navro'z va Bahor umummaktab bayramida qaysi ijodiy tanlov asosiy bo'lsin?",
+        organizer: "Madaniyat va san'at vazirligi",
+        category: "Madaniyat va san'at vazirligi",
+        options: [
+          { text: "Milliy taomlar va urf-odatlar ko'rgazmasi", votes: 115 },
+          { text: "Mini QVZ va qiziqarli sahna ko'rinishlari", votes: 98 },
+          { text: "Jonli vokal va milliy cholg'ular ijrosi", votes: 46 }
+        ],
+        totalVotes: 259,
         myChoice: null,
         status: "active",
         date: "2 kun oldin"
       },
       {
-        id: 'poll-2',
+        id: 'poll-it',
         title: "Keyingi oylik maktab Hackathon musobaqasi qaysi yo'nalishda bo'lsin?",
-        organizer: "AKSS IT Qo'mitasi",
-        category: "Texnologiya & IT",
+        organizer: "IT va media vazirligi",
+        category: "IT va media vazirligi",
         options: [
-          { text: "Sun'iy Intellekt va AI Agentlar (LLM)", votes: 118 },
+          { text: "Sun'iy Intellekt va AI Agentlar (LLM)", votes: 128 },
           { text: "Telegram Botlar & WebApp (TWA)", votes: 84 },
-          { text: "Kiberxavfsizlik & CTF (Ethical Hacking)", votes: 59 }
+          { text: "Kiberxavfsizlik & CTF (Ethical Hacking)", votes: 61 }
         ],
-        totalVotes: 261,
+        totalVotes: 273,
+        myChoice: null,
+        status: "active",
+        date: "3 kun oldin"
+      },
+      {
+        id: 'poll-sport',
+        title: "Bahorgi sinflararo maktab chempionati qaysi sport turi bo'yicha o'tkazilsin?",
+        organizer: "Sport vazirligi",
+        category: "Sport vazirligi",
+        options: [
+          { text: "Mini-futbol (Chempionlar ligasi kubogi)", votes: 152 },
+          { text: "Stol tennisi (Yakkalik va juftlik)", votes: 64 },
+          { text: "Shaxmat va shashka intellektual turniri", votes: 49 }
+        ],
+        totalVotes: 265,
         myChoice: null,
         status: "active",
         date: "4 kun oldin"
       },
       {
-        id: 'poll-3',
-        title: "Oshxonadagi tushlik taomlari menyusiga qaysi yangi taom qo'shilsin?",
-        organizer: "Oshxona Komissiyasi",
-        category: "Oshxona & Taomlar",
+        id: 'poll-ekologiya',
+        title: "Maktab hududida 'Yashil Makon' loyihasi bo'yicha qaysi tashabbusni boshlaymiz?",
+        organizer: "Ekologiya vazirligi",
+        category: "Ekologiya vazirligi",
         options: [
-          { text: "Lag'mon & Qovurma", votes: 96 },
-          { text: "Mini Pitsa & Toster", votes: 72 },
-          { text: "Tovuqli Salat & Grechka", votes: 41 }
+          { text: "Sinfxonalarga batareyka va plastiklarni saralash qutilari", votes: 104 },
+          { text: "Maktab bog'iga yangi mevali daraxtlar va atirgullar ekish", votes: 89 },
+          { text: "Qog'oz chiqindilarini yig'ish (Makulatura haftaligi)", votes: 47 }
         ],
-        totalVotes: 209,
+        totalVotes: 240,
         myChoice: null,
         status: "active",
-        date: "6 kun oldin"
+        date: "5 kun oldin"
+      },
+      {
+        id: 'poll-mamuriyat',
+        title: "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
+        organizer: "Maktab ma'muriyati",
+        category: "Maktab ma'muriyati",
+        options: [
+          { text: "Ha, to'liq qo'llab-quvvatlayman (Hudi / Jinsi)", votes: 168 },
+          { text: "Faqat to'q rangli erkin kiyim ruxsat etilsin", votes: 38 },
+          { text: "Klassik maktab formasi qolgani ma'qul", votes: 16 }
+        ],
+        totalVotes: 222,
+        myChoice: null,
+        status: "active",
+        date: "1 hafta oldin"
       }
     ];
 
-    let polls = JSON.parse(localStorage.getItem('akss_polls')) || DEFAULT_POLLS;
+    let storedPolls = null;
+    try {
+      storedPolls = JSON.parse(localStorage.getItem('akss_polls'));
+    } catch (e) {}
+
+    if (!storedPolls || !Array.isArray(storedPolls) || storedPolls.length < 5) {
+      storedPolls = DEFAULT_POLLS;
+      localStorage.setItem('akss_polls', JSON.stringify(DEFAULT_POLLS));
+    }
+
+    let polls = storedPolls;
     let userPollChoices = JSON.parse(localStorage.getItem('akss_poll_choices')) || {};
+    let currentPollMinistry = 'all';
 
     // --- SYNC WITH REAL SERVER BACKEND ---
     async function syncWithServer() {
@@ -1607,13 +1897,83 @@
       }
     };
 
+    // --- VAZIRLIKLAR KARTALARINI CHIQARISH ---
+    function renderMinistryCards() {
+      const container = document.getElementById('ministry-filter-cards');
+      if (!container) return;
+      container.innerHTML = '';
+
+      POLL_MINISTRIES.forEach(m => {
+        let count = 0;
+        if (m.id === 'all') {
+          count = polls.length;
+        } else {
+          count = polls.filter(p => p.category === m.id || p.organizer === m.id).length;
+        }
+
+        const isActive = currentPollMinistry === m.id;
+        const card = document.createElement('div');
+        card.className = `ministry-card ${isActive ? 'active' : ''}`;
+        card.onclick = () => selectMinistryFilter(m.id);
+
+        card.innerHTML = `
+          <div class="m-icon" style="background: ${m.color}22; color: ${m.color};">
+            <i class="fa-solid ${m.icon}"></i>
+          </div>
+          <div class="m-info">
+            <div class="m-name" title="${m.name}">${m.name}</div>
+            <div class="m-count">${count} ta so'rovnoma</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.selectMinistryFilter = function(ministryId) {
+      currentPollMinistry = ministryId;
+      renderPolls();
+    };
+
+    window.openNewPollForMinistry = function(ministryName) {
+      if (ministryName && ministryName !== 'all') {
+        const catSelect = document.getElementById('poll-category');
+        const orgSelect = document.getElementById('poll-organizer');
+        if (catSelect) catSelect.value = ministryName;
+        if (orgSelect) orgSelect.value = ministryName;
+      }
+      openNewPollModal();
+    };
+
     // --- RENDER POLLS ---
     function renderPolls() {
+      renderMinistryCards();
+      updateMetrics();
+
       const feed = document.getElementById('polls-feed');
       if (!feed) return;
       feed.innerHTML = '';
 
-      polls.forEach(poll => {
+      const filteredPolls = currentPollMinistry === 'all'
+        ? polls
+        : polls.filter(p => p.category === currentPollMinistry || p.organizer === currentPollMinistry);
+
+      if (filteredPolls.length === 0) {
+        feed.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: rgba(15, 23, 42, 0.4); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px;">
+            <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 24px; color: #64748b;">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h4 style="font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">Ushbu vazirlikda hozircha faol so'rovnoma yo'q</h4>
+            <p style="font-size: 12.5px; color: #94a3b8; max-width: 420px; margin: 0 auto 16px;">Student Council a'zolari ushbu yo'nalish bo'yicha tez orada yangi so'rovnoma e'lon qilishadi.</p>
+            <button onclick="openNewPollForMinistry('${currentPollMinistry}')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
+              <i class="fa-solid fa-plus"></i> Yangi so'rovnoma ochish (Admin)
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      filteredPolls.forEach(poll => {
         const myChoice = userPollChoices[poll.id] !== undefined ? userPollChoices[poll.id] : poll.myChoice;
         const hasVoted = myChoice !== null && myChoice !== undefined;
         const totalVotes = poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
@@ -1729,6 +2089,7 @@
           if (res.ok) {
             polls = polls.filter(p => p.id !== pollId);
             localStorage.setItem('akss_polls', JSON.stringify(polls));
+            updateMetrics();
             renderPolls();
             alert("✅ So'rovnoma muvaffaqiyatli o'chirildi!");
             return;
@@ -1740,6 +2101,7 @@
           // offline fallback
           polls = polls.filter(p => p.id !== pollId);
           localStorage.setItem('akss_polls', JSON.stringify(polls));
+          updateMetrics();
           renderPolls();
           alert("✅ So'rovnoma o'chirildi!");
         }
@@ -1831,6 +2193,7 @@
       }
 
       localStorage.setItem('akss_polls', JSON.stringify(polls));
+      updateMetrics();
       renderPolls();
       document.getElementById('new-poll-form').reset();
       closeNewPollModal();
@@ -2106,6 +2469,9 @@
 
       proposals = proposals.filter(p => p.id !== propId);
       saveState();
+      updateMetrics();
+      renderFeed();
+      alert("🗑️ Taklif muvaffaqiyatli o'chirildi!");
     };
     window.toggleVote = async function(id) {
       const item = proposals.find(p => p.id === id);
@@ -2150,14 +2516,31 @@
     // --- METRICS UPDATE ---
     function updateMetrics() {
       const total = proposals.length;
-      const activeCouncil = proposals.filter(p => p.votes >= 50 && p.status !== 'resolved').length;
+      const activeCouncil = proposals.filter(p => (p.votes >= 50 || p.status === 'council') && p.status !== 'resolved').length;
       const resolved = proposals.filter(p => p.status === 'resolved').length;
-      const totalVotes = proposals.reduce((acc, p) => acc + p.votes, 0);
+      const totalVotes = proposals.reduce((acc, p) => acc + (p.votes || 0), 0);
 
-      document.getElementById('stat-total').innerText = total + " ta";
-      document.getElementById('stat-active').innerText = activeCouncil + " ta";
-      document.getElementById('stat-resolved').innerText = resolved + " ta";
-      document.getElementById('stat-votes').innerText = totalVotes + "+";
+      const elTotal = document.getElementById('stat-total');
+      if (elTotal) elTotal.innerText = total + " ta";
+
+      const elActive = document.getElementById('stat-active');
+      if (elActive) elActive.innerText = activeCouncil + " ta";
+
+      const elResolved = document.getElementById('stat-resolved');
+      if (elResolved) elResolved.innerText = resolved + " ta";
+
+      const elVotes = document.getElementById('stat-votes');
+      if (elVotes) elVotes.innerText = totalVotes + "+";
+
+      // Dynamically update section counters (badges)
+      const propBadge = document.getElementById('badge-proposals-count');
+      if (propBadge) {
+        propBadge.innerText = total;
+      }
+      const pollBadge = document.getElementById('badge-polls-count');
+      if (pollBadge) {
+        pollBadge.innerText = `${polls.length} ta faol`;
+      }
     }
 
     // --- FILTER TAB CLICKS ---

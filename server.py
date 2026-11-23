@@ -99,47 +99,86 @@ def init_db():
             INSERT INTO proposals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', initial_seeds)
 
-    # Populate initial realistic polls if empty
+    # Populate initial realistic polls for all 6 Ministries if empty
     c.execute('SELECT COUNT(*) FROM polls')
     if c.fetchone()[0] == 0:
         initial_polls = [
             (
                 'poll-1',
-                "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
-                "Student Council & Ma'muriyat",
-                "Maktab Tartibi",
+                "Xalqaro olimpiada va SAT tayyorgarligi uchun haftaning qaysi kunida qo'shimcha master-klass o'tkazilsin?",
+                "Ta'lim va ilm-fan vazirligi",
+                "Ta'lim va ilm-fan vazirligi",
                 json.dumps([
-                    {"text": "Ha, to'liq qo'llab-quvvatlayman (Hudi/Jinsi)", "votes": 142},
-                    {"text": "Faqat to'q rangli erkin kiyim ruxsat etilsin", "votes": 35},
-                    {"text": "Klassik forma qolgani ma'qul", "votes": 14}
+                    {"text": "Shanba kuni darsdan so'ng (14:00 - 16:00)", "votes": 78},
+                    {"text": "Chorshanba kuni katta tanaffusda", "votes": 34},
+                    {"text": "Yakshanba kuni onlayn (Zoom orqali)", "votes": 52}
+                ], ensure_ascii=False),
+                time.time() - 86400 * 1,
+                "active"
+            ),
+            (
+                'poll-2',
+                "Navro'z va Bahor umummaktab bayramida qaysi ijodiy tanlov asosiy bo'lsin?",
+                "Madaniyat va san'at vazirligi",
+                "Madaniyat va san'at vazirligi",
+                json.dumps([
+                    {"text": "Milliy taomlar va urf-odatlar ko'rgazmasi", "votes": 115},
+                    {"text": "Mini QVZ va qiziqarli sahna ko'rinishlari", "votes": 98},
+                    {"text": "Jonli vokal va milliy cholg'ular ijrosi", "votes": 46}
                 ], ensure_ascii=False),
                 time.time() - 86400 * 2,
                 "active"
             ),
             (
-                'poll-2',
+                'poll-3',
                 "Keyingi oylik maktab Hackathon musobaqasi qaysi yo'nalishda bo'lsin?",
-                "AKSS IT Qo'mitasi",
-                "Texnologiya & IT",
+                "IT va media vazirligi",
+                "IT va media vazirligi",
                 json.dumps([
-                    {"text": "Sun'iy Intellekt va AI Agentlar (LLM)", "votes": 118},
+                    {"text": "Sun'iy Intellekt va AI Agentlar (LLM)", "votes": 128},
                     {"text": "Telegram Botlar & WebApp (TWA)", "votes": 84},
-                    {"text": "Kiberxavfsizlik & CTF (Ethical Hacking)", "votes": 59}
+                    {"text": "Kiberxavfsizlik & CTF (Ethical Hacking)", "votes": 61}
+                ], ensure_ascii=False),
+                time.time() - 86400 * 3,
+                "active"
+            ),
+            (
+                'poll-4',
+                "Bahorgi sinflararo maktab chempionati qaysi sport turi bo'yicha o'tkazilsin?",
+                "Sport vazirligi",
+                "Sport vazirligi",
+                json.dumps([
+                    {"text": "Mini-futbol (Chempionlar ligasi kubogi)", "votes": 152},
+                    {"text": "Stol tennisi (Yakkalik va juftlik)", "votes": 64},
+                    {"text": "Shaxmat va shashka intellektual turniri", "votes": 49}
                 ], ensure_ascii=False),
                 time.time() - 86400 * 4,
                 "active"
             ),
             (
-                'poll-3',
-                "Oshxonadagi tushlik taomlari menyusiga qaysi yangi taom qo'shilsin?",
-                "Oshxona Komissiyasi",
-                "Oshxona & Taomlar",
+                'poll-5',
+                "Maktab hududida 'Yashil Makon' loyihasi bo'yicha qaysi tashabbusni boshlaymiz?",
+                "Ekologiya vazirligi",
+                "Ekologiya vazirligi",
                 json.dumps([
-                    {"text": "Lag'mon & Qovurma", "votes": 96},
-                    {"text": "Mini Pitsa & Toster", "votes": 72},
-                    {"text": "Tovuqli Salat & Grechka", "votes": 41}
+                    {"text": "Sinfxonalarga batareyka va plastiklarni saralash qutilari", "votes": 104},
+                    {"text": "Maktab bog'iga yangi mevali daraxtlar va atirgullar ekish", "votes": 89},
+                    {"text": "Qog'oz chiqindilarini yig'ish (Makulatura haftaligi)", "votes": 47}
                 ], ensure_ascii=False),
-                time.time() - 86400 * 6,
+                time.time() - 86400 * 5,
+                "active"
+            ),
+            (
+                'poll-6',
+                "Juma kunlari maktabda erkin kiyim (IT Casual / Qulay kiyim) kuni joriy etilishiga rozimisiz?",
+                "Maktab ma'muriyati",
+                "Maktab ma'muriyati",
+                json.dumps([
+                    {"text": "Ha, to'liq qo'llab-quvvatlayman (Hudi / Jinsi)", "votes": 168},
+                    {"text": "Faqat to'q rangli erkin kiyim ruxsat etilsin", "votes": 38},
+                    {"text": "Klassik maktab formasi qolgani ma'qul", "votes": 16}
+                ], ensure_ascii=False),
+                time.time() - 86400 * 7,
                 "active"
             )
         ]
