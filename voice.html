@@ -1066,12 +1066,18 @@
       margin-left: auto;
     }
 
-    /* Responsive */
+    /* Responsive Helpers */
     .btn-text-short { display: none; }
+    .tab-label-short { display: none; }
+    .badge-text-short { display: none; }
 
     @media (max-width: 768px) {
-      .btn-text-full { display: none; }
-      .btn-text-short { display: inline; }
+      .btn-text-full { display: none !important; }
+      .btn-text-short { display: inline !important; }
+      .tab-label-full { display: none !important; }
+      .tab-label-short { display: inline !important; }
+      .badge-text-full { display: none !important; }
+      .badge-text-short { display: inline !important; }
 
       header {
         padding: 12px 14px;
@@ -1102,85 +1108,161 @@
       }
       .btn-admin-auth, .btn-council-report, .btn-new-proposal {
         flex: 1;
-        padding: 9px 6px;
-        font-size: 11.5px;
+        padding: 8px 6px;
+        font-size: 11px;
         justify-content: center;
         text-align: center;
         white-space: nowrap;
+        border-radius: 10px;
+        gap: 5px;
       }
 
       main {
-        padding: 14px 10px 40px;
+        padding: 12px 10px 40px;
       }
       .hero-banner {
-        padding: 16px 14px;
+        padding: 14px 12px;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        border-radius: 16px;
       }
       .hero-text h2 {
-        font-size: 15px;
+        font-size: 14.5px;
       }
       .hero-text p {
-        font-size: 12px;
-        line-height: 1.5;
+        font-size: 11.5px;
+        line-height: 1.45;
       }
-
-      .metrics-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .metric-card {
-        padding: 12px 10px;
-        gap: 10px;
-      }
-      .metric-card .icon-wrap {
-        width: 36px;
-        height: 36px;
-        font-size: 15px;
-      }
-      .metric-card .num {
-        font-size: 20px;
-      }
-      .metric-card .label {
+      .shield-badge {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        padding: 6px 12px;
         font-size: 11px;
       }
 
-      .feed-toolbar {
-        flex-direction: column;
-        align-items: stretch;
+      /* Statistics Cards on Mobile: neat 2x2 grid */
+      .stats-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .stat-box {
+        padding: 10px 10px;
         gap: 10px;
+        border-radius: 14px;
       }
-      .filter-tabs {
-        overflow-x: auto;
+      .stat-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+      .stat-info h3 {
+        font-size: 17px;
+      }
+      .stat-info p {
+        font-size: 10px;
+        line-height: 1.25;
+      }
+
+      /* Main Section Switcher on Mobile: 3 responsive columns */
+      .section-nav-wrap {
+        width: 100%;
+        margin-bottom: 16px;
+        padding: 0;
+      }
+      .section-nav {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        padding: 4px;
+        gap: 4px;
+        border-radius: 14px;
+        box-sizing: border-box;
+      }
+      .section-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 8px 3px;
+        font-size: 11px;
+        justify-content: center;
+        border-radius: 10px;
+        gap: 4px;
         white-space: nowrap;
-        padding-bottom: 4px;
-        -webkit-overflow-scrolling: touch;
       }
-      .filter-tab {
-        padding: 8px 12px;
+      .section-btn i {
         font-size: 12px;
         flex-shrink: 0;
       }
-      .category-select-wrap select {
-        width: 100%;
+      .tab-label-short {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .badge-counter {
+        font-size: 9.5px;
+        padding: 2px 5px;
+        border-radius: 8px;
+        flex-shrink: 0;
       }
 
+      /* Feed Toolbar & Filter Tabs on Mobile */
+      .controls-strip {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .filter-tabs {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 4px;
+        gap: 4px;
+        border-radius: 12px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+      }
+      .filter-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        padding: 7px 11px;
+        font-size: 11.5px;
+        flex-shrink: 0;
+        border-radius: 8px;
+      }
+      .category-select {
+        width: 100%;
+        font-size: 12.5px;
+        padding: 9px 12px;
+        border-radius: 10px;
+      }
+
+      /* Proposal Cards on Mobile */
       .proposal-card {
         flex-direction: column;
-        gap: 14px;
-        padding: 16px 14px;
+        gap: 12px;
+        padding: 14px 12px;
+        border-radius: 16px;
       }
       .vote-box {
         flex-direction: row;
         width: 100%;
-        height: 44px;
-        gap: 12px;
+        height: 42px;
+        gap: 10px;
         justify-content: center;
+        border-radius: 12px;
       }
       .vote-count {
         margin-top: 0;
+        font-size: 14px;
       }
 
+      /* Ministry Grid on Mobile */
       .ministry-grid {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
@@ -1192,23 +1274,57 @@
         border-radius: 12px;
       }
       .ministry-card .m-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 15px;
-        border-radius: 9px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        border-radius: 8px;
       }
       .ministry-card .m-name {
-        font-size: 11.5px;
+        font-size: 11px;
         line-height: 1.25;
       }
       .ministry-card .m-count {
-        font-size: 10px;
+        font-size: 9.5px;
+      }
+
+      /* Direct Message & Poll Card on Mobile */
+      .sub-banner {
+        padding: 14px 12px !important;
+        margin-bottom: 16px !important;
+        border-radius: 14px !important;
+      }
+      .dm-banner {
+        padding: 14px 12px !important;
+        margin-bottom: 16px !important;
+        border-radius: 14px !important;
+      }
+      .dm-card {
+        padding: 16px 14px !important;
+        border-radius: 16px !important;
+      }
+      .poll-card {
+        padding: 16px 14px;
+        border-radius: 16px;
+      }
+      .poll-question {
+        font-size: 15px;
+        margin-bottom: 14px;
+      }
+      .poll-option-btn {
+        padding: 10px 12px;
+      }
+      .poll-option-text {
+        font-size: 12.5px;
+      }
+      .poll-option-stats {
+        font-size: 12px;
       }
 
       .modal-box {
-        max-width: 94% !important;
-        padding: 20px 16px !important;
+        max-width: 95% !important;
+        padding: 18px 14px !important;
         margin: 10px;
+        border-radius: 18px;
       }
     }
   </style>
@@ -1231,7 +1347,8 @@
       <div class="header-actions">
         <button class="btn-admin-auth" id="btn-admin-mode" onclick="toggleAdminMode()" title="Maktab ma'muriyati yoki Student Council uchun">
           <i class="fa-solid fa-lock"></i>
-          <span id="admin-mode-text">Admin</span>
+          <span class="btn-text-full">Admin Kirish</span>
+          <span class="btn-text-short">Admin</span>
         </button>
         <button class="btn-council-report" id="btn-open-report">
           <i class="fa-solid fa-clipboard-list"></i>
@@ -1313,18 +1430,27 @@
       <div class="section-nav">
         <button class="section-btn active" id="sec-btn-proposals" onclick="switchSection('proposals')">
           <i class="fa-solid fa-bullhorn"></i>
-          <span>Takliflar & Muammolar</span>
+          <span class="tab-label-full">Takliflar & Muammolar</span>
+          <span class="tab-label-short">Takliflar</span>
           <span class="badge-counter" id="badge-proposals-count">0</span>
         </button>
         <button class="section-btn" id="sec-btn-polls" onclick="switchSection('polls')">
           <i class="fa-solid fa-square-poll-vertical"></i>
-          <span>Maktab So'rovnomalari (Polls)</span>
-          <span class="badge-counter" id="badge-polls-count" style="background: rgba(16, 185, 129, 0.3); color: #34d399;">0 ta faol</span>
+          <span class="tab-label-full">Maktab So'rovnomalari (Polls)</span>
+          <span class="tab-label-short">So'rovlar</span>
+          <span class="badge-counter" id="badge-polls-count" style="background: rgba(16, 185, 129, 0.3); color: #34d399;">
+            <span class="badge-text-full">0 ta faol</span>
+            <span class="badge-text-short">0</span>
+          </span>
         </button>
         <button class="section-btn" id="sec-btn-dm" onclick="switchSection('dm')">
           <i class="fa-solid fa-paper-plane" style="color: #a855f7;"></i>
-          <span>Erkin Murojaat</span>
-          <span class="badge-counter" id="badge-dm-count" style="background: rgba(168, 85, 247, 0.25); color: #c084fc;">@shoxislom ga</span>
+          <span class="tab-label-full">Erkin Murojaat</span>
+          <span class="tab-label-short">Murojaat</span>
+          <span class="badge-counter" id="badge-dm-count" style="background: rgba(168, 85, 247, 0.25); color: #c084fc;">
+            <span class="badge-text-full">@shoxislom ga</span>
+            <span class="badge-text-short">Xat</span>
+          </span>
         </button>
       </div>
     </div>
@@ -1335,16 +1461,24 @@
       <div class="controls-strip">
         <div class="filter-tabs">
           <button class="tab-btn active" data-filter="trending">
-            <i class="fa-solid fa-fire"></i> Trenddagi (Eng ko'p ovoz)
+            <i class="fa-solid fa-fire"></i>
+            <span class="tab-label-full">Trenddagi (Eng ko'p ovoz)</span>
+            <span class="tab-label-short">Trend</span>
           </button>
           <button class="tab-btn" data-filter="council">
-            <i class="fa-solid fa-gavel"></i> Direktor stolida (50+)
+            <i class="fa-solid fa-gavel"></i>
+            <span class="tab-label-full">Direktor stolida (50+)</span>
+            <span class="tab-label-short">50+ Ovoz</span>
           </button>
           <button class="tab-btn" data-filter="resolved">
-            <i class="fa-solid fa-check-double"></i> Bajarilganlar
+            <i class="fa-solid fa-check-double"></i>
+            <span class="tab-label-full">Bajarilganlar</span>
+            <span class="tab-label-short">Bajarilgan</span>
           </button>
           <button class="tab-btn" data-filter="latest">
-            <i class="fa-solid fa-clock"></i> Eng yangi
+            <i class="fa-solid fa-clock"></i>
+            <span class="tab-label-full">Eng yangi</span>
+            <span class="tab-label-short">Yangi</span>
           </button>
         </div>
 
@@ -1367,7 +1501,7 @@
 
     <!-- SECTION 2: POLLS -->
     <div id="section-polls" style="display: none;">
-      <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div class="sub-banner" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
           <h3 style="font-size: 16px; font-weight: 700; color: #fff;"><i class="fa-solid fa-chart-pie" style="color: #60a5fa; margin-right: 8px;"></i> Rasmiy Maktab So'rovnomalari (Vazirliklar kesimida)</h3>
           <p style="font-size: 12.5px; color: #94a3b8; margin-top: 3px;">Student Council vazirliklari va Maktab Ma'muriyati tomonidan o'quvchilar va o'qituvchilar fikrini o'rganish bo'limi.</p>
@@ -1393,7 +1527,7 @@
     <!-- SECTION 3: ERKIN MUROJAAT (FREE MESSAGE DIRECT TO @shoxislom) -->
     <div id="section-direct-message" style="display: none;">
       <!-- Informational banner -->
-      <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(59, 130, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 18px; padding: 22px 26px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div class="dm-banner" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(59, 130, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 18px; padding: 22px 26px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div style="max-width: 600px;">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
             <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(168, 85, 247, 0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #c084fc;">
@@ -1416,7 +1550,7 @@
       </div>
 
       <!-- Main Form Card with 2 Inputs -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 28px; max-width: 760px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);">
+      <div class="dm-card" style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 20px; padding: 28px; max-width: 760px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);">
         <form id="direct-message-form" onsubmit="event.preventDefault(); submitDirectMessage();">
           
           <!-- Input 1: Subject -->
@@ -2489,9 +2623,17 @@
 
       if (list.length === 0) {
         feed.innerHTML = `
-          <div style="text-align:center; padding: 50px 20px; color: #94a3b8;">
-            <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 12px; color: #475569;"></i>
-            <p>Ushbu bo'limda hozircha hech qanday taklif topilmadi.</p>
+          <div style="text-align:center; padding: 42px 18px; color: #94a3b8; background: rgba(15, 23, 42, 0.45); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 18px; margin: 6px 0 20px;">
+            <div style="width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 14px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 22px;">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h4 style="font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px;">Hozircha hech qanday taklif topilmadi</h4>
+            <p style="font-size: 12.5px; color: #64748b; margin-bottom: 16px; max-width: 320px; margin-left: auto; margin-right: auto; line-height: 1.4;">
+              Ushbu bo'limda hali takliflar yo'q. Maktabimiz rivoji uchun birinchi taklifingizni qoldiring!
+            </p>
+            <button onclick="openModal()" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);">
+              <i class="fa-solid fa-plus"></i> Taklif Qoldirish
+            </button>
           </div>
         `;
         return;
@@ -2682,10 +2824,10 @@
       if (!btn) return;
       if (isAdminMode) {
         btn.classList.add('active');
-        btn.innerHTML = '<i class="fa-solid fa-crown" style="color: #fbbf24;"></i> <span>Admin (Chiqish)</span>';
+        btn.innerHTML = '<i class="fa-solid fa-crown" style="color: #fbbf24;"></i> <span class="btn-text-full">Admin (Chiqish)</span><span class="btn-text-short">Chiqish</span>';
       } else {
         btn.classList.remove('active');
-        btn.innerHTML = '<i class="fa-solid fa-lock"></i> <span>Admin Kirish</span>';
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> <span class="btn-text-full">Admin Kirish</span><span class="btn-text-short">Admin</span>';
       }
     }
 
@@ -2799,7 +2941,7 @@
       }
       const pollBadge = document.getElementById('badge-polls-count');
       if (pollBadge) {
-        pollBadge.innerText = `${polls.length} ta faol`;
+        pollBadge.innerHTML = `<span class="badge-text-full">${polls.length} ta faol</span><span class="badge-text-short">${polls.length}</span>`;
       }
     }
 
