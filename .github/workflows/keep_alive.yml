@@ -1,0 +1,14 @@
+name: Keep Alive AK SS Voice
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # Har 10 daqiqada
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Server
+        run: |
+          curl -s -f -I "https://akss-voice.onrender.com/api/proposals" || true

@@ -604,13 +604,13 @@ class VoiceAPIHandler(SimpleHTTPRequestHandler):
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "9273166206:AAGjhSkH1qoWIrBBIA1xhtDLFJfMyrACAFc").strip()
 WEB_APP_URL = os.getenv("WEB_APP_URL", "https://akss-voice.onrender.com").strip()
 
-def tg_api_call(method, payload=None):
+def tg_api_call(method, payload=None, timeout=12):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
     headers = {"Content-Type": "application/json"}
     data = json.dumps(payload).encode("utf-8") if payload else None
     req = urllib.request.Request(url, data=data, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=8) as res:
+        with urllib.request.urlopen(req, timeout=timeout) as res:
             return json.loads(res.read().decode("utf-8"))
     except Exception as e:
         if "timed out" not in str(e).lower():
@@ -698,8 +698,9 @@ def run_telegram_bot_daemon():
     offset = 0
     while True:
         try:
-            # 1 soniyalik ultra-tezkor tekshiruv (kechikishlarsiz)
-            updates = tg_api_call("getUpdates", {"offset": offset, "timeout": 1})
+            # Standart Telegram Long Polling (timeout: 20 soniya, socket: 28 soniya)
+            # Foydalanuvchi tugma bosgan yoki xabar yozgan lahzaning o'zidayoq Telegram uni 0.05 soniyada uzatadi!
+            updates = tg_api_call("getUpdates", {"offset": offset, "timeout": 20}, timeout=28)
             if updates and updates.get("ok"):
                 for item in updates.get("result", []):
                     offset = item["update_id"] + 1
@@ -917,6 +918,19 @@ def run_telegram_bot_daemon():
         except Exception as e:
             time.sleep(2)
 
+def keep_alive_ping_worker():
+    """Render bulutida serverni uyquga ketmasligini ta'minlash uchun har 4 daqiqada o'zini o'zi chaqirib turadi"""
+    time.sleep(15)
+    while True:
+        try:
+            url = f"{WEB_APP_URL.rstrip('/')}/api/proposals"
+            req = urllib.request.Request(url, headers={'User-Agent': 'AKSS-Voice-SelfPing/1.0'})
+            with urllib.request.urlopen(req, timeout=10) as res:
+                _ = res.read()
+        except Exception:
+            pass
+        time.sleep(240)  # Har 4 daqiqada (Render 15 daqiqalik uyqu chegarasidan ancha oldin)
+
 def run_server(port=None):
     if port is None:
         port = int(os.environ.get('PORT', 3000))
@@ -926,6 +940,11 @@ def run_server(port=None):
     bot_thread = threading.Thread(target=run_telegram_bot_daemon, daemon=True)
     bot_thread.start()
     print("🤖 Telegram Boti bulutda (Render) 24/7 orqa fonda ishga tushdi!")
+
+    # Start Keep-Alive Ping Worker to prevent Render from sleeping
+    ping_thread = threading.Thread(target=keep_alive_ping_worker, daemon=True)
+    ping_thread.start()
+    print("⚡ Keep-Alive avtomatik uyg'oq saqlovchi ishga tushdi!")
 
     server_address = ('', port)
     httpd = HTTPServer(server_address, VoiceAPIHandler)
